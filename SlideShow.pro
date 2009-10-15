@@ -35,7 +35,7 @@ QMAKE_EXTRA_TARGETS += svnbuild
 svnbuildhook.depends = svnbuild
 CONFIG(debug,debug|release):svnbuildhook.target = Makefile.Debug
 CONFIG(release,debug|release):svnbuildhook.target = Makefile.Release
-#QMAKE_EXTRA_TARGETS += svnbuildhook
+QMAKE_EXTRA_TARGETS += svnbuildhook
 
 # Enable GNU profiling (if desired).
 #QMAKE_CXXFLAGS_DEBUG += -pg
