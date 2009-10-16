@@ -31,6 +31,9 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     switch (event->key()) {
+        case Qt::Key_Escape:
+            close();
+            break;
         case Qt::Key_F:
             if (isFullScreen())
                 showNormal();
@@ -45,6 +48,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event) {
     switch (event->key()) {
+        case Qt::Key_Escape: // fall-through.
         case Qt::Key_F:
             event->setAccepted(true);
             break;
