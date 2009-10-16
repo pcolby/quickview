@@ -19,8 +19,9 @@ class MainWindow : public QWidget { Q_OBJECT
     void closeEvent(QCloseEvent *event);
     void keyPressEvent(QKeyEvent *event);   // Remember: widgets should not override keyPressEvent
     void keyReleaseEvent(QKeyEvent *event); // without also overriding keyReleaseEvent accordingly.
+    void mouseDoubleClickEvent(QMouseEvent *event);
     void paintEvent(QPaintEvent *event);
-    void resizeEvent(QResizeEvent *event);  // TODO: Remove this override?
+    void resizeEvent(QResizeEvent *event);
     void timerEvent(QTimerEvent *event);
 
   private:

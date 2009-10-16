@@ -75,6 +75,14 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
     }
 }
 
+void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
+    if (isFullScreen())
+        showNormal();
+    else
+        showFullScreen();
+    event->setAccepted(true);
+}
+
 void MainWindow::paintEvent(QPaintEvent *event) {
     // Calculate the source and destination rectangles.
     QRect targetRect=event->rect().intersected(pixmapRect);
