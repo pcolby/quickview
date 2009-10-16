@@ -7,6 +7,8 @@
 MainWindow::MainWindow(const QString &dirName, const QStringList &fileNames, const int duration, QWidget *parent/*=0*/, Qt::WindowFlags flags/*=0*/)
         : QWidget(parent,flags), dirName(dirName), fileNames(fileNames), fileNamesIndex(-1) {
     Q_ASSERT(!fileNames.isEmpty());
+    setAttribute(Qt::WA_NoSystemBackground,true);
+    setAttribute(Qt::WA_OpaquePaintEvent,true);
     setWindowTitle(QString::fromAscii("%1 %2").arg(QApplication::applicationName()).arg(QApplication::applicationVersion()));
 
     // Load the first image.
@@ -60,6 +62,7 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     // Paint the pixmap.
     QPainter painter(this);
     painter.save();
+    painter.fillRect(event->rect(),Qt::black);
     painter.drawPixmap(targetRect,pixmapScaled,sourceRect);
     painter.restore();
 }
