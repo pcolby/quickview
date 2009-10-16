@@ -22,7 +22,9 @@ int main(int argc, char *argv[]) {
     // Prompt for the directory to show images from.
     QSettings settings;
     QString dirName=settings.value(QString::fromAscii("directory")).toString();
+#ifndef DEBUG
     dirName=QFileDialog::getExistingDirectory(0,QObject::tr("Open Images Directory"),dirName);
+#endif
     if (dirName.isEmpty()) return 1;
     settings.setValue(QString::fromAscii("directory"),dirName);
 
@@ -40,10 +42,12 @@ int main(int argc, char *argv[]) {
 
     // Prompt for the image duration.
     int duration=settings.value(QString::fromAscii("duration"),3000).toInt();
+#ifndef DEBUG
     bool ok;
     duration=QInputDialog::getInt(0,QObject::tr("Duration"),QObject::tr("How long (in milliseonds) should each image display for?"),
                                   duration,100,2147483647,1,&ok);
     if (!ok) return 3;
+#endif
     settings.setValue(QString::fromAscii("duration"),duration);
 
     // Instantiate the main window.
