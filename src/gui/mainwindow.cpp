@@ -14,6 +14,9 @@ MainWindow::MainWindow(const QString &dirName, const QStringList &fileNames, con
     // Load the first image.
     loadNextImage();
 
+    // Start the load timer.
+    timerId=startTimer(duration);
+
     // Restore the window's size and position.
     QSettings settings;
     QVariant geometry=settings.value(QString::fromAscii("geometry"));
@@ -31,15 +34,27 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     switch (event->key()) {
-        case Qt::Key_Escape:
+        case Qt::Key_Escape: // Exit application.
             close();
             break;
-        case Qt::Key_F:
+        case Qt::Key_F: // Toggle fullscreen mode.
             if (isFullScreen())
                 showNormal();
             else
                 showFullScreen();
             event->setAccepted(true);
+            break;
+        case Qt::Key_P: // Pause/un-pause the slideshow (ie fall-through).
+        case Qt::Key_S: // Start/stop the slideshow.
+            if (timerId==0) // Start.
+                timerId=startTimer(duration);
+            else { // Stop.
+                killTimer(timerId);
+                timerId=0;
+            }
+            break;
+        case Qt::Key_Space: // Advance to the next image.
+            loadNextImage();
             break;
         default:
             QWidget::keyPressEvent(event);
@@ -49,7 +64,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 void MainWindow::keyReleaseEvent(QKeyEvent *event) {
     switch (event->key()) {
         case Qt::Key_Escape: // fall-through.
-        case Qt::Key_F:
+        case Qt::Key_F:      // fall-through.
+        case Qt::Key_P:      // fall-through.
+        case Qt::Key_S:      // fall-through.
+        case Qt::Key_Space:
             event->setAccepted(true);
             break;
         default:
@@ -87,7 +105,11 @@ void MainWindow::timerEvent(QTimerEvent *event) {
 
 void MainWindow::loadNextImage() {
     // Kill any current timers first.
-    if (timerId!=0) killTimer(timerId);
+    const bool wasRunning=(timerId!=0);
+    if (wasRunning) {
+        killTimer(timerId);
+        timerId=0;
+    }
 
     // Load the next image.
     fileNamesIndex++; // Move to the next image.
@@ -99,8 +121,9 @@ void MainWindow::loadNextImage() {
     scalePixmap(true);
     repaint();
 
-    // Re-start the load timer.
-    timerId=this->startTimer(duration);
+    // Re-start the load timer (if we stopped it above).
+    if (wasRunning)
+        timerId=startTimer(duration);
 }
 
 void MainWindow::scalePixmap(const bool force/*=false*/) {
