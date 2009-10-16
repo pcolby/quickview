@@ -7,7 +7,7 @@ class MainWindow : public QWidget { Q_OBJECT
   private:
     QString dirName;
     QStringList fileNames;
-    int fileNamesIndex;
+    int duration, fileNamesIndex, timerId;
     QPixmap pixmap, pixmapScaled;
     QPoint pixmapOffset;
     QRect pixmapRect;

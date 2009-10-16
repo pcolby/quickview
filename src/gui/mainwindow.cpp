@@ -5,7 +5,7 @@
 #include <QSettings>
 
 MainWindow::MainWindow(const QString &dirName, const QStringList &fileNames, const int duration, QWidget *parent/*=0*/, Qt::WindowFlags flags/*=0*/)
-        : QWidget(parent,flags), dirName(dirName), fileNames(fileNames), fileNamesIndex(-1) {
+        : QWidget(parent,flags), dirName(dirName), fileNames(fileNames), duration(duration), fileNamesIndex(-1), timerId(0) {
     Q_ASSERT(!fileNames.isEmpty());
     setAttribute(Qt::WA_NoSystemBackground,true);
     setAttribute(Qt::WA_OpaquePaintEvent,true);
@@ -77,17 +77,30 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
 }
 
 void MainWindow::timerEvent(QTimerEvent *event) {
-    loadNextImage();
+    if (event->timerId()==timerId) {
+        event->setAccepted(true);
+        loadNextImage();
+    } else QObject::timerEvent(event);
 }
 
 /* Private functions */
 
 void MainWindow::loadNextImage() {
+    // Kill any current timers first.
+    if (timerId!=0) killTimer(timerId);
+
+    // Load the next image.
     fileNamesIndex++; // Move to the next image.
     if (fileNamesIndex>=fileNames.count())
         fileNamesIndex=0; // Repeat all ;)
     pixmap.load(QString::fromAscii("%1/%2").arg(dirName).arg(fileNames.at(fileNamesIndex)));
+
+    // Scale, and paint the new image.
     scalePixmap(true);
+    repaint();
+
+    // Re-start the load timer.
+    timerId=this->startTimer(duration);
 }
 
 void MainWindow::scalePixmap(const bool force/*=false*/) {
