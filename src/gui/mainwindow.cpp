@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
+#include <QIcon>
 #include <QPainter>
 #include <QResizeEvent>
 #include <QSettings>
@@ -142,6 +143,7 @@ void MainWindow::loadNextImage() {
     if (fileNamesIndex>=fileNames.count())
         fileNamesIndex=0; // Repeat all ;)
     pixmap.load(QString::fromAscii("%1/%2").arg(dirName).arg(fileNames.at(fileNamesIndex)));
+    setWindowIcon(QIcon(pixmap));
     updateWindowTitle();
 
     // Scale, and paint the new image.
