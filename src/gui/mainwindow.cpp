@@ -129,6 +129,10 @@ void MainWindow::loadNextImage() {
     scalePixmap(true);
     repaint();
 
+    // Update the window title text.
+    setWindowTitle(QString::fromAscii("%1 - %2 %3").arg(fileNames.at(fileNamesIndex))
+                   .arg(QApplication::applicationName()).arg(QApplication::applicationVersion()));
+
     // Re-start the load timer (if we stopped it above).
     if (wasRunning)
         timerId=startTimer(duration);
