@@ -10,13 +10,15 @@ MainWindow::MainWindow(const QString &dirName, const QStringList &fileNames, con
     Q_ASSERT(!fileNames.isEmpty());
     setAttribute(Qt::WA_NoSystemBackground,true);
     setAttribute(Qt::WA_OpaquePaintEvent,true);
-    updateWindowTitle();
 
     // Load the first image.
     loadNextImage();
 
     // Start the load timer.
     timerId=startTimer(duration);
+
+    // Set the window title.
+    updateWindowTitle();
 
     // Restore the window's size and position.
     QSettings settings;
@@ -53,6 +55,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
                 killTimer(timerId);
                 timerId=0;
             }
+            updateWindowTitle();
             break;
         case Qt::Key_Space: // Advance to the next image.
             loadNextImage();
@@ -113,19 +116,28 @@ void MainWindow::timerEvent(QTimerEvent *event) {
 /* Protected slots */
 
 void MainWindow::updateWindowTitle() {
-    // Get the version string.
+    // If we have a loaded file, show the filename first.
+    QString title;
+    if ((0 <= fileNamesIndex) && (fileNamesIndex < fileNames.size()))
+        title += QString::fromLatin1("%1 - ").arg(fileNames.at(fileNamesIndex));
+
+    // Indicate the "paused" state (if paused).
+    if (timerId == 0)
+        title += tr("PAUSED - ");
+
+    // Include the application name.
+    title += QApplication::applicationName() + QLatin1Char(' ');
+
+    // Include the version string.
     #ifdef DEBUG
     QRegExp versionMatch(QLatin1String("([^.]+\\.[^.]+\\.[^.]+\\.[^.]+)"));
     #else
     QRegExp versionMatch(QLatin1String("([^.]+\\.[^.]+\\.[^.]+)\\."));
     #endif // DEBUG
-    const QString versionStr=(QApplication::applicationVersion().contains(versionMatch)) ? versionMatch.cap(1) : QString::null;
+    title +=(QApplication::applicationVersion().contains(versionMatch)) ? versionMatch.cap(1) : QApplication::applicationVersion();
 
-    // Update the window title.
-    if ((0 <= fileNamesIndex) && (fileNamesIndex < fileNames.size()))
-        setWindowTitle(tr("%1 - %2 %3").arg(fileNames.at(fileNamesIndex)).arg(QApplication::applicationName()).arg(versionStr));
-    else
-        setWindowTitle(tr("%1 %2").arg(QApplication::applicationName()).arg(versionStr));
+    // Set the window title.
+    setWindowTitle(title);
 }
 
 /* Private functions */
@@ -144,7 +156,6 @@ void MainWindow::loadNextImage() {
         fileNamesIndex=0; // Repeat all ;)
     pixmap.load(QString::fromLatin1("%1/%2").arg(dirName).arg(fileNames.at(fileNamesIndex)));
     setWindowIcon(pixmap);
-    updateWindowTitle();
 
     // Scale, and paint the new image.
     scalePixmap(true);
@@ -153,6 +164,9 @@ void MainWindow::loadNextImage() {
     // Re-start the load timer (if we stopped it above).
     if (wasRunning)
         timerId=startTimer(duration);
+
+    // Update the window title.
+    updateWindowTitle();
 }
 
 void MainWindow::scalePixmap(const bool force/*=false*/) {
