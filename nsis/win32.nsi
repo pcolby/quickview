@@ -39,13 +39,13 @@ Var StartMenuFolder
 Section "SlideShow"
   # Files to install.
   SetOutPath $INSTDIR
-  File "C:\MinGW\bin\libgcc_s_dw2-1.dll"
-  File "C:\Program Files\Microsoft Visual Studio 9.0\VC\redist\x86\Microsoft.VC90.CRT\msvcr90.dll"
-  File "D:\Qt\4.6.0-beta1\bin\QtCore4.dll"
-  File "D:\Qt\4.6.0-beta1\bin\QtGui4.dll"
+  File "C:\QtSDK\Desktop\Qt\4.7.3\MinGW\bin\libgcc_s_dw2-1.dll"
+  File "C:\QtSDK\Desktop\Qt\4.7.3\MinGW\bin\mingwm10.dll"
+  File "C:\QtSDK\Desktop\Qt\4.7.3\MinGW\lib\QtCore4.dll"
+  File "C:\QtSDK\Desktop\Qt\4.7.3\MinGW\lib\QtGui4.dll"
   File "..\release\SlideShow.exe"
   SetOutPath $INSTDIR\imageformats
-  File /x "*d?.dll" "D:\Qt\4.6.0-beta1\plugins\imageformats\*.dll"
+  File /x "*d?.dll" "C:\QtSDK\Desktop\Qt\4.7.3\MinGW\plugins\imageformats\*.dll"
   WriteRegStr HKCU "Software\Software\Paul Colby\SlideShow" "" $INSTDIR
   WriteUninstaller $INSTDIR\Uninstall.exe
   # The various shortcuts.
