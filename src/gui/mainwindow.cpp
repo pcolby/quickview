@@ -9,7 +9,7 @@ MainWindow::MainWindow(const QString &dirName, const QStringList &fileNames, con
     Q_ASSERT(!fileNames.isEmpty());
     setAttribute(Qt::WA_NoSystemBackground,true);
     setAttribute(Qt::WA_OpaquePaintEvent,true);
-    setWindowTitle(QString::fromAscii("%1 %2").arg(QApplication::applicationName()).arg(QApplication::applicationVersion()));
+    updateWindowTitle();
 
     // Load the first image.
     loadNextImage();
@@ -109,6 +109,24 @@ void MainWindow::timerEvent(QTimerEvent *event) {
     } else QObject::timerEvent(event);
 }
 
+/* Protected slots */
+
+void MainWindow::updateWindowTitle() {
+    // Get the version string.
+    #ifdef DEBUG
+    QRegExp versionMatch(QLatin1String("([^.]+\\.[^.]+\\.[^.]+\\.[^.]+)"));
+    #else
+    QRegExp versionMatch(QLatin1String("([^.]+\\.[^.]+\\.[^.]+)\\."));
+    #endif // DEBUG
+    const QString versionStr=(QApplication::applicationVersion().contains(versionMatch)) ? versionMatch.cap(1) : QString::null;
+
+    // Update the window title.
+    if ((0 <= fileNamesIndex) && (fileNamesIndex < fileNames.size()))
+        setWindowTitle(tr("%1 - %2 %3").arg(fileNames.at(fileNamesIndex)).arg(QApplication::applicationName()).arg(versionStr));
+    else
+        setWindowTitle(tr("%1 %2").arg(QApplication::applicationName()).arg(versionStr));
+}
+
 /* Private functions */
 
 void MainWindow::loadNextImage() {
@@ -124,14 +142,11 @@ void MainWindow::loadNextImage() {
     if (fileNamesIndex>=fileNames.count())
         fileNamesIndex=0; // Repeat all ;)
     pixmap.load(QString::fromAscii("%1/%2").arg(dirName).arg(fileNames.at(fileNamesIndex)));
+    updateWindowTitle();
 
     // Scale, and paint the new image.
     scalePixmap(true);
     repaint();
-
-    // Update the window title text.
-    setWindowTitle(QString::fromAscii("%1 - %2 %3").arg(fileNames.at(fileNamesIndex))
-                   .arg(QApplication::applicationName()).arg(QApplication::applicationVersion()));
 
     // Re-start the load timer (if we stopped it above).
     if (wasRunning)

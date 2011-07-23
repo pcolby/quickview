@@ -24,6 +24,9 @@ class MainWindow : public QWidget { Q_OBJECT
     void resizeEvent(QResizeEvent *event);
     void timerEvent(QTimerEvent *event);
 
+  protected slots:
+    void updateWindowTitle();
+
   private:
     void loadNextImage();
     void scalePixmap(const bool force=false);
