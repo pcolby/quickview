@@ -20,7 +20,7 @@ MainWindow::MainWindow(const QString &dirName, const QStringList &fileNames, con
 
     // Restore the window's size and position.
     QSettings settings;
-    QVariant geometry=settings.value(QString::fromAscii("geometry"));
+    QVariant geometry=settings.value(QLatin1String("geometry"));
     if (geometry.isValid()) restoreGeometry(geometry.toByteArray());
     else setGeometry(40,40,1024,750); // 1024x750 at position (40,40).
 }
@@ -29,7 +29,7 @@ MainWindow::MainWindow(const QString &dirName, const QStringList &fileNames, con
 
 void MainWindow::closeEvent(QCloseEvent *event) {
     QSettings settings;
-    settings.setValue(QString::fromAscii("geometry"),saveGeometry());
+    settings.setValue(QLatin1String("geometry"),saveGeometry());
     QWidget::closeEvent(event);
 }
 
@@ -142,7 +142,7 @@ void MainWindow::loadNextImage() {
     fileNamesIndex++; // Move to the next image.
     if (fileNamesIndex>=fileNames.count())
         fileNamesIndex=0; // Repeat all ;)
-    pixmap.load(QString::fromAscii("%1/%2").arg(dirName).arg(fileNames.at(fileNamesIndex)));
+    pixmap.load(QString::fromLatin1("%1/%2").arg(dirName).arg(fileNames.at(fileNamesIndex)));
     setWindowIcon(pixmap);
     updateWindowTitle();
 

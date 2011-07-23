@@ -38,7 +38,7 @@ bool VersionInfo::getAppVersion(qint16 &major, qint16 &minor, qint16 &error, qin
 QString VersionInfo::getAppVersionStr() {
     qint16 major, minor, error, build;
     return (getAppVersion(major,minor,error,build)) ?
-            QString::fromAscii("%1.%2.%3.%4").arg(major).arg(minor).arg(error).arg(build) : QString();
+            QString::fromLatin1("%1.%2.%3.%4").arg(major).arg(minor).arg(error).arg(build) : QString();
 }
 
 #endif // Q_OS_WIN
