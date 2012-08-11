@@ -48,6 +48,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             event->setAccepted(true);
             break;
         case Qt::Key_Left:
+        case Qt::Key_Z:
             loadPreviousImage();
             break;
         case Qt::Key_P: // Pause/un-pause the slideshow (ie fall-through).
@@ -62,6 +63,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             updateWindowTitle();
             break;
         case Qt::Key_Right:
+        case Qt::Key_X:
             loadNextImage();
             break;
         default:
