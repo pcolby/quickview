@@ -49,7 +49,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             break;
         case Qt::Key_Left:
         case Qt::Key_Z:
-            loadPreviousImage();
+            loadNextImage(false);
             break;
         case Qt::Key_P: // Pause/un-pause the slideshow (ie fall-through).
         case Qt::Key_S: // Start/stop the slideshow.
@@ -150,7 +150,7 @@ void MainWindow::updateWindowTitle() {
 
 /* Private functions */
 
-void MainWindow::loadNextImage() {
+void MainWindow::loadNextImage(const bool forwardDirection/*=true*/) {
     // Kill any current timers first.
     const bool wasRunning=(timerId!=0);
     if (wasRunning) {
@@ -159,36 +159,9 @@ void MainWindow::loadNextImage() {
     }
 
     // Load the next image.
-    fileNamesIndex++; // Move to the next image.
+    fileNamesIndex= (fileNamesIndex + (forwardDirection ? 1 : -1) + fileNames.count()) % fileNames.count();
     if (fileNamesIndex>=fileNames.count())
         fileNamesIndex=0; // Repeat all ;)
-    pixmap.load(QString::fromLatin1("%1/%2").arg(dirName).arg(fileNames.at(fileNamesIndex)));
-    setWindowIcon(pixmap);
-
-    // Scale, and paint the new image.
-    scalePixmap(true);
-    repaint();
-
-    // Re-start the load timer (if we stopped it above).
-    if (wasRunning)
-        timerId=startTimer(duration);
-
-    // Update the window title.
-    updateWindowTitle();
-}
-
-void MainWindow::loadPreviousImage() {
-    // Kill any current timers first.
-    const bool wasRunning=(timerId!=0);
-    if (wasRunning) {
-        killTimer(timerId);
-        timerId=0;
-    }
-
-    // Load the next image.
-    if (fileNamesIndex == 0)
-        fileNamesIndex = fileNames.count();
-    fileNamesIndex--; // Move to the previous image.
     pixmap.load(QString::fromLatin1("%1/%2").arg(dirName).arg(fileNames.at(fileNamesIndex)));
     setWindowIcon(pixmap);
 

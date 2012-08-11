@@ -28,7 +28,7 @@ class MainWindow : public QWidget { Q_OBJECT
     void updateWindowTitle();
 
   private:
-    void loadNextImage();
+    void loadNextImage(const bool forwardDirection=true);
     void loadPreviousImage();
     void scalePixmap(const bool force=false);
 };
