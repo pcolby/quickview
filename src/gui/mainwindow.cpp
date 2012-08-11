@@ -47,8 +47,12 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
                 showFullScreen();
             event->setAccepted(true);
             break;
+        case Qt::Key_Left:
+            loadPreviousImage();
+            break;
         case Qt::Key_P: // Pause/un-pause the slideshow (ie fall-through).
         case Qt::Key_S: // Start/stop the slideshow.
+        case Qt::Key_Space: // Advance to the next image.
             if (timerId==0) // Start.
                 timerId=startTimer(duration);
             else { // Stop.
@@ -57,7 +61,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             }
             updateWindowTitle();
             break;
-        case Qt::Key_Space: // Advance to the next image.
+        case Qt::Key_Right:
             loadNextImage();
             break;
         default:
@@ -69,9 +73,11 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
     switch (event->key()) {
         case Qt::Key_Escape: // fall-through.
         case Qt::Key_F:      // fall-through.
+        case Qt::Key_Left:   // fall-through.
         case Qt::Key_P:      // fall-through.
         case Qt::Key_S:      // fall-through.
         case Qt::Key_Space:
+        case Qt::Key_Right:
             event->setAccepted(true);
             break;
         default:
@@ -154,6 +160,33 @@ void MainWindow::loadNextImage() {
     fileNamesIndex++; // Move to the next image.
     if (fileNamesIndex>=fileNames.count())
         fileNamesIndex=0; // Repeat all ;)
+    pixmap.load(QString::fromLatin1("%1/%2").arg(dirName).arg(fileNames.at(fileNamesIndex)));
+    setWindowIcon(pixmap);
+
+    // Scale, and paint the new image.
+    scalePixmap(true);
+    repaint();
+
+    // Re-start the load timer (if we stopped it above).
+    if (wasRunning)
+        timerId=startTimer(duration);
+
+    // Update the window title.
+    updateWindowTitle();
+}
+
+void MainWindow::loadPreviousImage() {
+    // Kill any current timers first.
+    const bool wasRunning=(timerId!=0);
+    if (wasRunning) {
+        killTimer(timerId);
+        timerId=0;
+    }
+
+    // Load the next image.
+    if (fileNamesIndex == 0)
+        fileNamesIndex = fileNames.count();
+    fileNamesIndex--; // Move to the previous image.
     pixmap.load(QString::fromLatin1("%1/%2").arg(dirName).arg(fileNames.at(fileNamesIndex)));
     setWindowIcon(pixmap);
 

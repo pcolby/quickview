@@ -1,7 +1,7 @@
 @echo off
 
 :: Make sure the SlikSvn and UnxUtils binaries are in the path.
-PATH=%PATH%;C:\Program Files\SlikSvn\bin;C:\Program Files\UnxUtils\usr\local\wbin;C:\Program Files (x86)\UnxUtils\usr\local\wbin
+PATH=%PATH%;C:\Program Files\TortoiseSVN\bin;C:\Program Files\UnxUtils\usr\local\wbin;C:\Program Files (x86)\UnxUtils\usr\local\wbin
 
 :: Check that we have the right number of commandline arguments.
 if "%1" == "" goto usage
