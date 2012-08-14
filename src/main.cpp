@@ -11,6 +11,10 @@
 #define ORGANISATION_NAME   QLatin1String("Paul Colby")  // QSettings default constructor, so
 #define ORGANISATION_DOMAIN QLatin1String("colby.id.au") // should not change between versions.
 
+#ifdef DEBUG
+#include "os/filehandlerinfo.h"
+#endif
+
 int main(int argc, char *argv[]) {
     // Setup the primary Qt application object.
     QApplication app(argc, argv);
@@ -39,6 +43,12 @@ int main(int argc, char *argv[]) {
         QMessageBox::critical(0,QObject::tr("File not found"),QObject::tr("No images where found in the directory %1").arg(dirName));
         return 2;
     }
+
+#ifdef DEBUG
+    FileHandlerInfo::setHandledByThisApplication(QLatin1String("bmp"));
+    FileHandlerInfo::setHandledByThisApplication(QLatin1String("jpg"));
+    FileHandlerInfo::setHandledByThisApplication(QLatin1String("jpeg"));
+#endif
 
     // Prompt for the image duration.
     int duration=settings.value(QLatin1String("duration"),3000).toInt();

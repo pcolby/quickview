@@ -4,7 +4,7 @@
 #include <windows.h>
 
 // This function is pure win32 code.
-bool VersionInfo::getAppVersion(qint16 &major, qint16 &minor, qint16 &error, qint16 &build) {
+bool VersionInfo::getAppVersion(quint16 &major, quint16 &minor, quint16 &error, quint16 &build) {
     // Get the name of this executable.
     WCHAR FileName[MAX_PATH+1];
     if (!GetModuleFileName(NULL,FileName,MAX_PATH)) return false;
@@ -37,8 +37,18 @@ bool VersionInfo::getAppVersion(qint16 &major, qint16 &minor, qint16 &error, qin
     return true;
 }
 
+bool VersionInfo::getAppVersion(quint16 &major, quint16 &minor, quint16 &error) {
+    quint16 ignored;
+    return getAppVersion(major, minor, error, ignored);
+}
+
+bool VersionInfo::getAppVersion(quint16 &major, quint16 &minor) {
+    quint16 ignored;
+    return getAppVersion(major, minor, ignored);
+}
+
 QString VersionInfo::getAppVersionStr() {
-    qint16 major, minor, error, build;
+    quint16 major, minor, error, build;
     return (getAppVersion(major,minor,error,build)) ?
             QString::fromLatin1("%1.%2.%3.%4").arg(major).arg(minor).arg(error).arg(build) : QString();
 }

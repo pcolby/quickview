@@ -5,7 +5,9 @@
 #ifdef Q_OS_WIN // VersionInfo is a Windows-only class.
 class VersionInfo {
   public:
-    static bool getAppVersion(qint16 &major, qint16 &minor, qint16 &error, qint16 &build);
+    static bool getAppVersion(quint16 &major, quint16 &minor, quint16 &error, quint16 &build);
+    static bool getAppVersion(quint16 &major, quint16 &minor, quint16 &error);
+    static bool getAppVersion(quint16 &major, quint16 &minor);
     static QString getAppVersionStr();
 };
 #endif // Q_OS_WIN

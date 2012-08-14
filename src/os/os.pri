@@ -1,3 +1,3 @@
 DEPENDPATH += src/os
-win32: HEADERS += versioninfo.h
-win32: SOURCES += versioninfo.cpp
+win32: HEADERS += filehandlerinfo.h   versioninfo.h
+win32: SOURCES += filehandlerinfo.cpp versioninfo.cpp
