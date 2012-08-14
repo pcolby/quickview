@@ -34,10 +34,6 @@ bool FileHandlerInfo::setHandledByThisApplication(const QString &extension, cons
 
     // Make sure we have the relevant applicatioin class already.
     const QString programId(FileHandlerInfo::programId(extension));
-    /*QSettings settings(QString::fromLatin1("HKEY_CURRENT_USER\\SOFTWARE\\Classes\\%1").arg(programId), QSettings::NativeFormat);
-    settings.setValue(QLatin1String("shell/open/command/Default"),
-        QString::fromLatin1("\"%1\" \"%2\"").arg(QDir::toNativeSeparators(QApplication::applicationFilePath()), QLatin1String("%1")));*/
-
     QSettings settings(QString::fromLatin1("HKEY_CURRENT_USER\\SOFTWARE\\Classes"), QSettings::NativeFormat);
     settings.setValue(QString::fromLatin1("Applications/SlideShow.exe/shell/open/command/Default"),
         QString::fromLatin1("\"%1\" \"%2\"").arg(QDir::toNativeSeparators(QApplication::applicationFilePath()), QLatin1String("%1")));
@@ -47,11 +43,11 @@ bool FileHandlerInfo::setHandledByThisApplication(const QString &extension, cons
     settings.setValue(QString::fromLatin1(".%1/OpenWithList/SlideShow.exe/Default").arg(extension), QString());
     settings.setValue(QString::fromLatin1(".%1/OpenWithProgids/%2").arg(extension, programId), QString());
 
+    // Note, if the following UserChoice is set, then the above is overridden.
+    // If UserChoice is not set, Windows will let us set it to our own ProgId (not sure if we should),
+    // but if it has been set, Windows will not let us change it at all.
     QSettings settings2(QString::fromLatin1("HKEY_CURRENT_USER"), QSettings::NativeFormat);
     settings2.setValue(QString::fromLatin1("Software/Microsoft/Windows/CurrentVersion/Explorer/FileExts/.%1/UserChoice/Progid").arg(extension), programId);
-
-    // Check if HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ext\UserChoice\Progid is set, and not us!
-
     return false;
 }
 
