@@ -7,14 +7,13 @@
 
 #ifdef Q_OS_WIN // FileHandlerInfo is a Windows-only class.
 
-FileHandlerInfo::HandleModes FileHandlerInfo::isHandledByThisApplication(const QString &extension) {
-    // Construct a settings object for querying the native HKCR hive.
-    QSettings settings(QLatin1String("HKEY_CLASSES_ROOT"), QSettings::NativeFormat);
+#define HKEY_CLASSES_ROOT  QLatin1String("HKEY_CLASSES_ROOT")
+#define HKEY_CURRENT_USER  QLatin1String("HKEY_CURRENT_USER")
+#define HKEY_LOCAL_MACHINE QLatin1String("HKEY_LOCAL_MACHINE")
 
-    // Check if this application is the default hanlder for the extension.
-    const QString programId(FileHandlerInfo::programId(extension));
-    if (settings.value(QString::fromLatin1(".%1\\Default").arg(extension)).toString() == programId)
-        return HANDLED_BY_DEFAULT;
+bool FileHandlerInfo::isOpenWithEnabled(const QString &extension) {
+    // Construct a settings object for querying the native HKCR hive.
+    const QSettings settings(HKEY_CLASSES_ROOT, QSettings::NativeFormat);
 
     // Check if this application is in the extension's "open with program IDs" list.
     // Note, according to the MSDN, the OpenWithProgids entries should be REG_NONE values.
@@ -22,37 +21,55 @@ FileHandlerInfo::HandleModes FileHandlerInfo::isHandledByThisApplication(const Q
     // will return an "empty" QVariant, so we use the following "magic" value to detect
     // a non-existant registry key.
     #define NOT_FOUND_MAGIC_VALUE QLatin1String("9B2FC684-A679-41FB-92DE-18AE8B581678")
-    if (settings.value(QString::fromLatin1(".%1\\OpenWithProgids\\%2").arg(extension).arg(programId), NOT_FOUND_MAGIC_VALUE) != NOT_FOUND_MAGIC_VALUE)
-        return HANDLED_WITHIN_OPEN_WITH_PROGIDS;
-
-    /// @todo  Check if this application is in the extension's "open with list" list.
-    return NOT_HANDLED;
+    const QString key(QString::fromLatin1(".%1\\OpenWithProgids\\%2").arg(extension, programId(extension)));
+    return (settings.value(key, NOT_FOUND_MAGIC_VALUE) != NOT_FOUND_MAGIC_VALUE);
 }
 
-bool FileHandlerInfo::setHandledByThisApplication(const QString &extension, const HandleModes mode) {
-    Q_ASSERT(mode != NOT_HANDLED);
+bool FileHandlerInfo::isOpenWithDefault(const QString &extension) {
+    if (!isOpenWithEnabled(extension)) return false;
 
-    // Make sure we have the relevant applicatioin class already.
+    // Construct a settings object for querying the native HKCR hive.
+    const QSettings settings(HKEY_CLASSES_ROOT, QSettings::NativeFormat);
+
+    // Check if this application is the default handler for the extension.
+    return (settings.value(QString::fromLatin1(".%1\\Default").arg(extension)) == programId(extension));
+}
+
+// Note, this will not override values set in
+// Software/Microsoft/Windows/CurrentVersion/Explorer/FileExts/.%1/UserChoice/Progid, no will Windows
+// let us do so.
+bool FileHandlerInfo::enableOpenWith(const QString &extension, const UserScope scope) {
     const QString programId(FileHandlerInfo::programId(extension));
-    QSettings settings(QString::fromLatin1("HKEY_CURRENT_USER\\SOFTWARE\\Classes"), QSettings::NativeFormat);
-    settings.setValue(QString::fromLatin1("Applications/SlideShow.exe/shell/open/command/Default"),
-        QString::fromLatin1("\"%1\" \"%2\"").arg(QDir::toNativeSeparators(QApplication::applicationFilePath()), QLatin1String("%1")));
-    settings.setValue(QString::fromLatin1("%1/shell/open/command/Default").arg(programId),
-        QString::fromLatin1("\"%1\" \"%2\"").arg(QDir::toNativeSeparators(QApplication::applicationFilePath()), QLatin1String("%1")));
-    settings.setValue(QString::fromLatin1(".%1/Default").arg(extension), programId);
-    settings.setValue(QString::fromLatin1(".%1/OpenWithList/SlideShow.exe/Default").arg(extension), QString());
-    settings.setValue(QString::fromLatin1(".%1/OpenWithProgids/%2").arg(extension, programId), QString());
+    QSettings settings((scope == AllUsers) ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER, QSettings::NativeFormat);
 
-    // Note, if the following UserChoice is set, then the above is overridden.
-    // If UserChoice is not set, Windows will let us set it to our own ProgId (not sure if we should),
-    // but if it has been set, Windows will not let us change it at all.
-    QSettings settings2(QString::fromLatin1("HKEY_CURRENT_USER"), QSettings::NativeFormat);
-    settings2.setValue(QString::fromLatin1("Software/Microsoft/Windows/CurrentVersion/Explorer/FileExts/.%1/UserChoice/Progid").arg(extension), programId);
-    return false;
+    // Setup our program ID class.
+    const QString nativeFileName(QDir::toNativeSeparators(QApplication::applicationFilePath()));
+    settings.beginGroup(QString::fromLatin1("SOFTWARE/Classes/%1").arg(programId));
+    settings.setValue(QLatin1String("DefaultIcon/Default"), QString::fromLatin1("%1,0").arg(nativeFileName));
+    settings.setValue(QLatin1String("shell/open/command/Default"), QString::fromLatin1("\"%1\" \"%2\"").arg(nativeFileName, QLatin1String("%1")));
+    settings.endGroup();
+
+    // Add our program ID to the open-with-progIDs list.
+    settings.setValue(QString::fromLatin1(".%1/OpenWithProgids/%2").arg(extension, programId), QString());
+    return true;
 }
 
-// According to the MSDN, this program ID should take the form:
-//   ProductName.extension.versionMajor.versionMinor
+bool FileHandlerInfo::setOpenWithDefault(const QString &extension, const UserScope scope) {
+    // Make sure this application is open-with enabled.
+    if (!enableOpenWith(extension, scope))
+        return false;
+
+    // Set our program ID as the default for this extension.
+    QSettings settings((scope == AllUsers) ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER, QSettings::NativeFormat);
+    settings.setValue(QString::fromLatin1("SOFTWARE/Classes/.%1/Default").arg(extension), programId(extension));
+    return true;
+}
+
+/**
+ *  According to the MSDN, this program ID should take the form:
+ *    ProductName.extension.versionMajor.versionMinor
+ *  @see http://msdn.microsoft.com/en-us/library/bb165967
+ */
 QString FileHandlerInfo::programId(const QString &extension) {
     quint16 major(0), minor(0);
     VersionInfo::getAppVersion(major,minor);

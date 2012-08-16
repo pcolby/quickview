@@ -23,6 +23,25 @@ int main(int argc, char *argv[]) {
     app.setOrganizationDomain(ORGANISATION_DOMAIN);
     app.setApplicationVersion(VersionInfo::getAppVersionStr());
 
+    // Get list of image file formats supported by the installed Qt plugins.
+    const QList<QByteArray> formats=QImageReader::supportedImageFormats();
+
+    // Check the command line options.
+#ifdef Q_OS_WIN
+    const FileHandlerInfo::UserScope userScope =
+        (app.arguments().indexOf(QLatin1String("-all-users")) == -1) ? FileHandlerInfo::CurrentUser : FileHandlerInfo::AllUsers;
+    if (app.arguments().indexOf(QLatin1String("-enable-open-with")) != -1) {
+        foreach (QByteArray format, formats) {
+            FileHandlerInfo::enableOpenWith(QString::fromLatin1(format).toLower(), userScope);
+        }
+    }
+    if (app.arguments().indexOf(QLatin1String("-set-open-with-default")) != -1) {
+        foreach (QByteArray format, formats) {
+            FileHandlerInfo::setOpenWithDefault(QString::fromLatin1(format).toLower(), userScope);
+        }
+    }
+#endif
+
     // Prompt for the directory to show images from.
     QSettings settings;
     QString dirName=settings.value(QLatin1String("directory")).toString();
@@ -34,8 +53,7 @@ int main(int argc, char *argv[]) {
 
     // Fetch the list of image files in the chosen directory.
     QStringList nameFilters;
-    const QList<QByteArray> formats=QImageReader::supportedImageFormats();
-    foreach (QByteArray format, formats)
+    foreach (const QByteArray &format, formats)
         nameFilters << QString::fromLatin1("*.%1").arg(QString::fromLatin1(format).toLower());
     const QDir dir(dirName);
     const QStringList fileNames=dir.entryList(nameFilters,QDir::Files,QDir::Name);
@@ -43,12 +61,6 @@ int main(int argc, char *argv[]) {
         QMessageBox::critical(0,QObject::tr("File not found"),QObject::tr("No images where found in the directory %1").arg(dirName));
         return 2;
     }
-
-#ifdef DEBUG
-    FileHandlerInfo::setHandledByThisApplication(QLatin1String("bmp"));
-    FileHandlerInfo::setHandledByThisApplication(QLatin1String("jpg"));
-    FileHandlerInfo::setHandledByThisApplication(QLatin1String("jpeg"));
-#endif
 
     // Prompt for the image duration.
     int duration=settings.value(QLatin1String("duration"),3000).toInt();

@@ -6,14 +6,14 @@
 class FileHandlerInfo {
   public:
     typedef enum {
-        NOT_HANDLED = 0,
-        HANDLED_BY_DEFAULT,
-        HANDLED_WITHIN_OPEN_WITH_LIST,
-        HANDLED_WITHIN_OPEN_WITH_PROGIDS
-    } HandleModes;
+        AllUsers,
+        CurrentUser
+    } UserScope;
 
-    static HandleModes isHandledByThisApplication(const QString &extension);
-    static bool setHandledByThisApplication(const QString &extension, const HandleModes mode = HANDLED_BY_DEFAULT);
+    static bool isOpenWithEnabled(const QString &extension);
+    static bool isOpenWithDefault(const QString &extension);
+    static bool enableOpenWith(const QString &extension, const UserScope scope = CurrentUser);
+    static bool setOpenWithDefault(const QString &extension, const UserScope scope = CurrentUser);
 
   protected:
     static QString programId(const QString &extension);
