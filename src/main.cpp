@@ -30,15 +30,16 @@ int main(int argc, char *argv[]) {
 #ifdef Q_OS_WIN
     const FileHandlerInfo::UserScope userScope =
         (app.arguments().indexOf(QLatin1String("-all-users")) == -1) ? FileHandlerInfo::CurrentUser : FileHandlerInfo::AllUsers;
-    if (app.arguments().indexOf(QLatin1String("-enable-open-with")) != -1) {
-        foreach (QByteArray format, formats) {
-            FileHandlerInfo::enableOpenWith(QString::fromLatin1(format).toLower(), userScope);
-        }
-    }
     if (app.arguments().indexOf(QLatin1String("-set-open-with-default")) != -1) {
         foreach (QByteArray format, formats) {
             FileHandlerInfo::setOpenWithDefault(QString::fromLatin1(format).toLower(), userScope);
         }
+        return 0;
+    } else if (app.arguments().indexOf(QLatin1String("-enable-open-with")) != -1) {
+        foreach (QByteArray format, formats) {
+            FileHandlerInfo::enableOpenWith(QString::fromLatin1(format).toLower(), userScope);
+        }
+        return 0;
     }
 #endif
 
