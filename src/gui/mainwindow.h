@@ -13,7 +13,8 @@ class MainWindow : public QWidget { Q_OBJECT
     QRect pixmapRect;
 
   public:
-    MainWindow(const QString &dirName, const QStringList &fileNames, const int duration, QWidget *parent=0, Qt::WindowFlags flags=0);
+    MainWindow(const QString &dirName, const QStringList &fileNames, const int duration,
+               const int fileNamesIndex=0, QWidget *parent=0, Qt::WindowFlags flags=0);
 
   protected:
     void closeEvent(QCloseEvent *event);

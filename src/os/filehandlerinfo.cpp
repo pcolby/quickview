@@ -50,7 +50,7 @@ bool FileHandlerInfo::enableOpenWith(const QString &extension, const UserScope s
     settings.endGroup();
 
     // Add our program ID to the open-with-progIDs list.
-    settings.setValue(QString::fromLatin1(".%1/OpenWithProgids/%2").arg(extension, programId), QString());
+    settings.setValue(QString::fromLatin1("SOFTWARE/Classes/.%1/OpenWithProgids/%2").arg(extension, programId), QString());
     return true;
 }
 

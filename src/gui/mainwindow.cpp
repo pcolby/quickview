@@ -5,13 +5,17 @@
 #include <QResizeEvent>
 #include <QSettings>
 
-MainWindow::MainWindow(const QString &dirName, const QStringList &fileNames, const int duration, QWidget *parent/*=0*/, Qt::WindowFlags flags/*=0*/)
-        : QWidget(parent,flags), dirName(dirName), fileNames(fileNames), duration(duration), fileNamesIndex(-1), timerId(0) {
+MainWindow::MainWindow(const QString &dirName, const QStringList &fileNames, const int duration,
+                       const int fileNamesIndex, QWidget *parent, Qt::WindowFlags flags)
+        : QWidget(parent,flags), dirName(dirName), fileNames(fileNames), duration(duration), fileNamesIndex(fileNamesIndex), timerId(0) {
     Q_ASSERT(!fileNames.isEmpty());
+    Q_ASSERT(fileNamesIndex >= 0);
+    Q_ASSERT(fileNamesIndex < fileNames.size());
     setAttribute(Qt::WA_NoSystemBackground,true);
     setAttribute(Qt::WA_OpaquePaintEvent,true);
 
     // Load the first image.
+    this->fileNamesIndex--;
     loadNextImage();
 
     // Start the load timer.
