@@ -2,6 +2,7 @@
 #include "versioninfo.h"
 #include <QApplication>
 #include <QDir>
+#include <QMessageBox>
 #include <QSettings>
 #include <QVariant>
 
@@ -45,7 +46,7 @@ bool FileHandlerInfo::enableOpenWith(const QString &extension, const UserScope s
     // Setup our program ID class.
     const QString nativeFileName(QDir::toNativeSeparators(QApplication::applicationFilePath()));
     settings.beginGroup(QString::fromLatin1("SOFTWARE/Classes/%1").arg(programId));
-    settings.setValue(QLatin1String("DefaultIcon/Default"), QString::fromLatin1("%1,0").arg(nativeFileName));
+    settings.setValue(QLatin1String("DefaultIcon/Default"), defaultIcon(extension));//QString::fromLatin1("%1,0").arg(nativeFileName));
     settings.setValue(QLatin1String("shell/open/command/Default"), QString::fromLatin1("\"%1\" \"%2\"").arg(nativeFileName, QLatin1String("%1")));
     settings.endGroup();
 
@@ -63,6 +64,53 @@ bool FileHandlerInfo::setOpenWithDefault(const QString &extension, const UserSco
     QSettings settings((scope == AllUsers) ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER, QSettings::NativeFormat);
     settings.setValue(QString::fromLatin1("SOFTWARE/Classes/.%1/Default").arg(extension), programId(extension));
     return true;
+}
+
+QString FileHandlerInfo::defaultIcon(const QString &extension) {
+    /*// Use Window's default icon for the given file type.
+    const QSettings settings(HKEY_CLASSES_ROOT, QSettings::NativeFormat);
+
+    QString icon1 = settings.value(QString::fromLatin1("%1file/DefaultIcon/Default").arg(extension)).toString();
+    //if (!icon.isEmpty()) QMessageBox::information(0, QString::fromLatin1("A: %1").arg(extension), icon);
+    if (!icon1.isEmpty()) return icon1;
+
+    QString icon2 = settings.value(QString::fromLatin1("%1Image.Document/DefaultIcon/Default").arg(extension)).toString();
+    //if (!icon.isEmpty()) QMessageBox::information(0, QString::fromLatin1("B: %1").arg(extension), icon);
+    if (!icon2.isEmpty()) return icon2;
+
+    QString icon3 = settings.value(QString::fromLatin1("PhotoViewer.FileAssoc.%1/DefaultIcon/Default").arg(extension)).toString();
+    //if (!icon.isEmpty()) QMessageBox::information(0, QString::fromLatin1("C: %1").arg(extension), icon);
+    if (!icon3.isEmpty()) return icon3;
+
+    QMessageBox::information(0, QString::fromLatin1("%1").arg(extension), QString::fromLatin1("A: %1\nB: %2\nC: %3").arg(icon1, icon2, icon3));
+
+    //QMessageBox::information(0, QString::fromLatin1("D: %1").arg(extension), QLatin1String("not found"));*/
+
+    // If Windows has no default, pick our own from Windows's imageres.dll.
+    return QString::fromLatin1("%SystemRoot%\\System32\\imageres.dll,%1").arg(defaultIconIndex(extension));
+}
+
+int FileHandlerInfo::defaultIconIndex(const QString &extension) {
+    if ((extension == QLatin1String("bmp")) || (extension == QLatin1String("ico")) || (extension == QLatin1String("pbm")) ||
+        (extension == QLatin1String("pgm")) || (extension == QLatin1String("ppm")) || (extension == QLatin1String("tga")) ||
+        (extension == QLatin1String("xbm")) || (extension == QLatin1String("xpm")))
+        return -70;
+    else if (extension == QLatin1String("gif"))
+        return -71;
+    else if ((extension == QLatin1String("jpeg")) || (extension == QLatin1String("jpg")))
+        return -72;
+    else if ((extension == QLatin1String("mng")) || (extension == QLatin1String("png")))
+        return -83;
+    else if ((extension == QLatin1String("tif")) || (extension == QLatin1String("tiff")))
+        return -122;
+
+    /*
+    svg: iexplore,-17|  |
+    svgz:*/
+
+
+    QMessageBox::information(0, QString::fromLatin1("%1").arg(extension), QString::fromLatin1("unknonw"));
+    return -1;
 }
 
 /**

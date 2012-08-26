@@ -16,6 +16,8 @@ class FileHandlerInfo {
     static bool setOpenWithDefault(const QString &extension, const UserScope scope = CurrentUser);
 
   protected:
+    static QString defaultIcon(const QString &extension);
+    static int defaultIconIndex(const QString &extension);
     static QString programId(const QString &extension);
 };
 #endif // Q_OS_WIN
