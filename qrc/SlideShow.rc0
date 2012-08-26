@@ -1,4 +1,4 @@
-//IDI_ICON1 ICON DISCARDABLE "appIcon.ico"
+IDI_ICON1 ICON DISCARDABLE "..\\assets\\icon\\QuickView.ico"
 
 1 TYPELIB "SlideShow.rc"
 
