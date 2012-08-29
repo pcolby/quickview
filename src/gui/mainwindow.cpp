@@ -8,9 +8,6 @@
 #include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags): QWidget(parent,flags) {
-    /*Q_ASSERT(!fileNames.isEmpty());
-    Q_ASSERT(fileNamesIndex >= 0);
-    Q_ASSERT(fileNamesIndex < fileNames.size());*/
     setAttribute(Qt::WA_NoSystemBackground,true);
     setAttribute(Qt::WA_OpaquePaintEvent,true);
 
@@ -90,6 +87,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
+    // Remember: widgets should not override keyPressEvent without also overriding keyReleaseEvent accordingly.
     switch (event->key()) {
         case Qt::Key_Escape: // Exit application.
             close();
@@ -130,10 +128,12 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
         case Qt::Key_Escape: // fall-through.
         case Qt::Key_F:      // fall-through.
         case Qt::Key_Left:   // fall-through.
+        case Qt::Key_Z:
         case Qt::Key_P:      // fall-through.
         case Qt::Key_S:      // fall-through.
         case Qt::Key_Space:
         case Qt::Key_Right:
+        case Qt::Key_X:
             event->setAccepted(true);
             break;
         default:
