@@ -31,7 +31,7 @@ void MainWindow::loadNextImage() {
     if (filesToShow.isEmpty())
         return;
     if ((++currentFile)==filesToShow.constEnd())
-        currentFile==filesToShow.constBegin();
+        currentFile=filesToShow.constBegin();
     loadImage(*currentFile);
 }
 
@@ -39,7 +39,7 @@ void MainWindow::loadPreviousImage() {
     if (filesToShow.isEmpty())
         return;
     if (currentFile==filesToShow.constBegin())
-        currentFile==filesToShow.constEnd();
+        currentFile=filesToShow.constEnd();
     loadImage(*--currentFile);
 }
 
@@ -64,7 +64,7 @@ int MainWindow::setPath(const QFileInfo &fileInfo) {
     // If fileInfo is an actual file (as opposed to a directory), skip straight to the specified file.
     if ((fileInfo.isFile()) && (!filesToShow.empty())) {
         currentFile=filesToShow.constEnd();
-        for (QFileInfoList::ConstIterator iter=filesToShow.constBegin(); (currentFile==filesToShow.end()) && (iter!=filesToShow.end()); ++iter) {
+        for (QFileInfoList::ConstIterator iter=filesToShow.constBegin(); (currentFile==filesToShow.constEnd()) && (iter!=filesToShow.constEnd()); ++iter) {
             if (*iter==fileInfo)
                 currentFile=iter;
         }
