@@ -49,57 +49,28 @@ int main(int argc, char *argv[]) {
         fileInfo = QFileInfo(app.arguments().at(index));
     }
 
+    QSettings settings;
+    int duration=settings.value(QLatin1String("duration"),4000).toInt();
+
     // Prompt for the directory to show images from.
-    /*QSettings settings;
-    if (dirName.isEmpty()) {
-        dirName=settings.value(QLatin1String("directory")).toString();
+    if (!fileInfo.exists()) {
+        QString dirName=settings.value(QLatin1String("directory")).toString();
         dirName=QFileDialog::getExistingDirectory(0,QObject::tr("Open Images Directory"),dirName);
-    }
-    if (dirName.isEmpty()) return 1;
-    settings.setValue(QLatin1String("directory"),dirName);
+        if (dirName.isEmpty()) return 1;
+        settings.setValue(QLatin1String("directory"),dirName);
+        fileInfo=QFileInfo(dirName);
 
-    // Fetch the list of image files in the chosen directory.
-    QStringList nameFilters;
-    foreach (const QByteArray &format, formats)
-        nameFilters << QString::fromLatin1("*.%1").arg(QString::fromLatin1(format).toLower());
-    const QDir dir(dirName);
-    const QStringList fileNames=dir.entryList(nameFilters,QDir::Files,QDir::Name);
-    if (fileNames.isEmpty()) {
-        QMessageBox::critical(0,QObject::tr("File not found"),
-                              QObject::tr("No images where found in the directory %1")
-                              .arg(QDir::toNativeSeparators(dirName)));
-        return 2;
-    }*/
-
-    // If a filename was given, get the index of the selected file.
-    /*int fileIndex=0;
-    if (!fileName.isEmpty()) {
-        fileIndex=-1;
-        for (int index=0; (fileIndex < 0) && (index < fileNames.size()); ++index) {
-            if (fileNames.at(index) == fileName)
-                fileIndex = index;
-        }
-        if (fileIndex < 0) {
-            QMessageBox::warning(0,QObject::tr("File not found"),QObject::tr("Could not find %1 in %2")
-                                 .arg(QDir::toNativeSeparators(fileName), QDir::toNativeSeparators(dirName)));
-            fileIndex=0;
-        }
-    }*/
-
-    // Prompt for the image duration, unless a file was specified on the command line.
-    /*int duration=settings.value(QLatin1String("duration"),4000).toInt();
-    if (fileName.isEmpty()) {
+        // Prompt for the image duration, unless a file was specified on the command line.
         bool ok;
         duration=QInputDialog::getInt(0,QObject::tr("Duration"),QObject::tr("How long (in milliseonds) should each image display for?"),
                                       duration,100,2147483647,1,&ok);
         if (!ok) return 3;
         settings.setValue(QLatin1String("duration"),duration);
-    }*/
+    }
 
     // Instantiate the main window.
     MainWindow *mainWindow=new MainWindow;
-    if (fileInfo.exists())
-        mainWindow->setPath(fileInfo);
+    mainWindow->setPath(fileInfo);
     mainWindow->show();
     return app.exec();
 }
