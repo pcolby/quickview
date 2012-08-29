@@ -49,7 +49,7 @@ void MainWindow::setDuration(const int duration) {
 
 int MainWindow::setPath(const QFileInfo &fileInfo) {
     Q_ASSERT(fileInfo.exists());
-    const QDir dir = (fileInfo.isDir()) ? QDir(fileInfo.absolutePath()) : fileInfo.dir();
+    const QDir dir = (fileInfo.isDir()) ? QDir(fileInfo.absoluteFilePath()) : fileInfo.dir();
 
     // Get list of image file formats supported by the installed Qt plugins.
     const QList<QByteArray> formats=QImageReader::supportedImageFormats();
