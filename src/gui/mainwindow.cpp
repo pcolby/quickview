@@ -1,24 +1,21 @@
 #include "mainwindow.h"
 #include <QApplication>
+#include <QDir>
 #include <QIcon>
+#include <QImageReader>
 #include <QPainter>
 #include <QResizeEvent>
 #include <QSettings>
 
-MainWindow::MainWindow(const QString &dirName, const QStringList &fileNames, const int duration,
-                       const int fileNamesIndex, QWidget *parent, Qt::WindowFlags flags)
-        : QWidget(parent,flags), dirName(dirName), fileNames(fileNames), duration(duration), fileNamesIndex(fileNamesIndex), timerId(0) {
-    Q_ASSERT(!fileNames.isEmpty());
+MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags): QWidget(parent,flags) {
+    /*Q_ASSERT(!fileNames.isEmpty());
     Q_ASSERT(fileNamesIndex >= 0);
-    Q_ASSERT(fileNamesIndex < fileNames.size());
+    Q_ASSERT(fileNamesIndex < fileNames.size());*/
     setAttribute(Qt::WA_NoSystemBackground,true);
     setAttribute(Qt::WA_OpaquePaintEvent,true);
 
-    // Load the first image.
-    this->fileNamesIndex--;
-    loadNextImage();
-
     // Start the load timer.
+    duration=4000;
     timerId=startTimer(duration);
 
     // Set the window title.
@@ -29,6 +26,59 @@ MainWindow::MainWindow(const QString &dirName, const QStringList &fileNames, con
     QVariant geometry=settings.value(QLatin1String("geometry"));
     if (geometry.isValid()) restoreGeometry(geometry.toByteArray());
     else setGeometry(40,40,1024,750); // 1024x750 at position (40,40).
+}
+
+/* Public slots */
+
+void MainWindow::loadNextImage() {
+    if (filesToShow.isEmpty())
+        return;
+    if ((++currentFile)==filesToShow.constEnd())
+        currentFile==filesToShow.constBegin();
+    loadImage(*currentFile);
+}
+
+void MainWindow::loadPreviousImage() {
+    if (filesToShow.isEmpty())
+        return;
+    if (currentFile==filesToShow.constBegin())
+        currentFile==filesToShow.constEnd();
+    loadImage(*--currentFile);
+}
+
+void MainWindow::setDuration(const int duration) {
+    this->duration=duration;
+}
+
+int MainWindow::setPath(const QFileInfo &fileInfo) {
+    Q_ASSERT(fileInfo.exists());
+    const QDir dir = (fileInfo.isDir()) ? QDir(fileInfo.absolutePath()) : fileInfo.dir();
+
+    // Get list of image file formats supported by the installed Qt plugins.
+    const QList<QByteArray> formats=QImageReader::supportedImageFormats();
+
+    // Fetch the list of image files in the chosen directory.
+    QStringList nameFilters;
+    foreach (const QByteArray &format, formats)
+        nameFilters << QString::fromLatin1("*.%1").arg(QString::fromLatin1(format).toLower());
+    filesToShow=dir.entryInfoList(nameFilters,QDir::Files,QDir::Name);
+    currentFile=(filesToShow.isEmpty()) ? filesToShow.constEnd() : filesToShow.constBegin();
+
+    // If fileInfo is an actual file (as opposed to a directory), skip straight to the specified file.
+    if ((fileInfo.isFile()) && (!filesToShow.empty())) {
+        currentFile=filesToShow.constEnd();
+        for (QFileInfoList::ConstIterator iter=filesToShow.constBegin(); (currentFile==filesToShow.end()) && (iter!=filesToShow.end()); ++iter) {
+            if (*iter==fileInfo)
+                currentFile=iter;
+        }
+        if (currentFile==filesToShow.constEnd())
+            currentFile=filesToShow.constBegin();
+    }
+
+    // Load the first image.
+    if (!filesToShow.isEmpty())
+        loadImage(*currentFile);
+    return filesToShow.size();
 }
 
 /* Qt event overrides */
@@ -53,7 +103,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
             break;
         case Qt::Key_Left:
         case Qt::Key_Z:
-            loadNextImage(false);
+            loadPreviousImage();
             break;
         case Qt::Key_P: // Pause/un-pause the slideshow (ie fall-through).
         case Qt::Key_S: // Start/stop the slideshow.
@@ -130,8 +180,8 @@ void MainWindow::timerEvent(QTimerEvent *event) {
 void MainWindow::updateWindowTitle() {
     // If we have a loaded file, show the filename first.
     QString title;
-    if ((0 <= fileNamesIndex) && (fileNamesIndex < fileNames.size()))
-        title += QString::fromLatin1("%1 - ").arg(fileNames.at(fileNamesIndex));
+    if (!filesToShow.isEmpty())
+        title += QString::fromLatin1("%1 - ").arg(currentFile->fileName());
 
     // Indicate the "paused" state (if paused).
     if (timerId == 0)
@@ -154,7 +204,7 @@ void MainWindow::updateWindowTitle() {
 
 /* Private functions */
 
-void MainWindow::loadNextImage(const bool forwardDirection/*=true*/) {
+void MainWindow::loadImage(const QFileInfo &fileInfo) {
     // Kill any current timers first.
     const bool wasRunning=(timerId!=0);
     if (wasRunning) {
@@ -162,12 +212,8 @@ void MainWindow::loadNextImage(const bool forwardDirection/*=true*/) {
         timerId=0;
     }
 
-    // Load the next image.
-    fileNamesIndex= (fileNamesIndex + (forwardDirection ? 1 : -1) + fileNames.count()) % fileNames.count();
-    if (fileNamesIndex>=fileNames.count())
-        fileNamesIndex=0; // Repeat all ;)
-    pixmap.load(QString::fromLatin1("%1/%2").arg(dirName).arg(fileNames.at(fileNamesIndex)));
-    setWindowIcon(pixmap);
+    // Load the image.
+    pixmap.load(fileInfo.absoluteFilePath());
 
     // Scale, and paint the new image.
     scalePixmap(true);

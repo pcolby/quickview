@@ -2,21 +2,24 @@
 #define __MAIN_WINDOW_H__
 
 #include <QWidget>
+#include <QFileInfo>
 
 class MainWindow : public QWidget { Q_OBJECT
-  private:
-    QString dirName;
-    QStringList fileNames;
-    int duration, fileNamesIndex, timerId;
+  public:
+    MainWindow(QWidget *parent=0, Qt::WindowFlags flags=0);
+
+  public slots:
+    void setDuration(const int duration);
+    int setPath(const QFileInfo &fileInfo);
+
+  protected:
+    int duration, timerId;
+    QFileInfoList filesToShow;
+    QFileInfoList::const_iterator currentFile;
     QPixmap pixmap, pixmapScaled;
     QPoint pixmapOffset;
     QRect pixmapRect;
 
-  public:
-    MainWindow(const QString &dirName, const QStringList &fileNames, const int duration,
-               const int fileNamesIndex=0, QWidget *parent=0, Qt::WindowFlags flags=0);
-
-  protected:
     void closeEvent(QCloseEvent *event);
     void keyPressEvent(QKeyEvent *event);   // Remember: widgets should not override keyPressEvent
     void keyReleaseEvent(QKeyEvent *event); // without also overriding keyReleaseEvent accordingly.
@@ -26,11 +29,12 @@ class MainWindow : public QWidget { Q_OBJECT
     void timerEvent(QTimerEvent *event);
 
   protected slots:
+    void loadNextImage();
+    void loadPreviousImage();
     void updateWindowTitle();
 
   private:
-    void loadNextImage(const bool forwardDirection=true);
-    void loadPreviousImage();
+    void loadImage(const QFileInfo &fileInfo);
     void scalePixmap(const bool force=false);
 };
 
