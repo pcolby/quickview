@@ -9,6 +9,8 @@ class MainWindow : public QWidget { Q_OBJECT
     MainWindow(QWidget *parent=0, Qt::WindowFlags flags=0);
 
   public slots:
+    bool pause();
+    bool play();
     void setDuration(const int duration);
     int setPath(const QFileInfo &fileInfo);
 

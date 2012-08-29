@@ -7,13 +7,9 @@
 #include <QResizeEvent>
 #include <QSettings>
 
-MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags): QWidget(parent,flags) {
+MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags): QWidget(parent,flags), timerId(0) {
     setAttribute(Qt::WA_NoSystemBackground,true);
     setAttribute(Qt::WA_OpaquePaintEvent,true);
-
-    // Start the load timer.
-    duration=4000;
-    timerId=startTimer(duration);
 
     // Set the window title.
     updateWindowTitle();
@@ -27,20 +23,19 @@ MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags): QWidget(parent,f
 
 /* Public slots */
 
-void MainWindow::loadNextImage() {
-    if (filesToShow.isEmpty())
-        return;
-    if ((++currentFile)==filesToShow.constEnd())
-        currentFile=filesToShow.constBegin();
-    loadImage(*currentFile);
+bool MainWindow::pause() {
+    if (timerId==0)
+        return false; // Was not previously running.
+    killTimer(timerId);
+    timerId=0;
+    return true; // Was previously running.
 }
 
-void MainWindow::loadPreviousImage() {
-    if (filesToShow.isEmpty())
-        return;
-    if (currentFile==filesToShow.constBegin())
-        currentFile=filesToShow.constEnd();
-    loadImage(*--currentFile);
+bool MainWindow::play() {
+    if (timerId!=0)
+        return true; // Was previously running.
+    timerId=startTimer(duration);
+    return false; // Was not previously running.
 }
 
 void MainWindow::setDuration(const int duration) {
@@ -70,7 +65,7 @@ int MainWindow::setPath(const QFileInfo &fileInfo) {
         }
         if (currentFile==filesToShow.constEnd())
             currentFile=filesToShow.constBegin();
-    }
+    } else play();
 
     // Load the first image.
     if (!filesToShow.isEmpty())
@@ -107,11 +102,9 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_S: // Start/stop the slideshow.
         case Qt::Key_Space: // Advance to the next image.
             if (timerId==0) // Start.
-                timerId=startTimer(duration);
-            else { // Stop.
-                killTimer(timerId);
-                timerId=0;
-            }
+                play();
+            else
+                pause();
             updateWindowTitle();
             break;
         case Qt::Key_Right:
@@ -177,6 +170,22 @@ void MainWindow::timerEvent(QTimerEvent *event) {
 
 /* Protected slots */
 
+void MainWindow::loadNextImage() {
+    if (filesToShow.isEmpty())
+        return;
+    if ((++currentFile)==filesToShow.constEnd())
+        currentFile=filesToShow.constBegin();
+    loadImage(*currentFile);
+}
+
+void MainWindow::loadPreviousImage() {
+    if (filesToShow.isEmpty())
+        return;
+    if (currentFile==filesToShow.constBegin())
+        currentFile=filesToShow.constEnd();
+    loadImage(*--currentFile);
+}
+
 void MainWindow::updateWindowTitle() {
     // If we have a loaded file, show the filename first.
     QString title;
@@ -206,11 +215,7 @@ void MainWindow::updateWindowTitle() {
 
 void MainWindow::loadImage(const QFileInfo &fileInfo) {
     // Kill any current timers first.
-    const bool wasRunning=(timerId!=0);
-    if (wasRunning) {
-        killTimer(timerId);
-        timerId=0;
-    }
+    const bool wasRunning=pause();
 
     // Load the image.
     pixmap.load(fileInfo.absoluteFilePath());
@@ -221,7 +226,7 @@ void MainWindow::loadImage(const QFileInfo &fileInfo) {
 
     // Re-start the load timer (if we stopped it above).
     if (wasRunning)
-        timerId=startTimer(duration);
+        play();
 
     // Update the window title.
     updateWindowTitle();

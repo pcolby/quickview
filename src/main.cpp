@@ -70,6 +70,7 @@ int main(int argc, char *argv[]) {
 
     // Instantiate the main window.
     MainWindow *mainWindow=new MainWindow;
+    mainWindow->setDuration(duration);
     mainWindow->setPath(fileInfo);
     mainWindow->show();
     return app.exec();
