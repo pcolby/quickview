@@ -58,7 +58,7 @@ int MainWindow::setPath(const QFileInfo &fileInfo) {
     QStringList nameFilters;
     foreach (const QByteArray &format, formats)
         nameFilters << QString::fromLatin1("*.%1").arg(QString::fromLatin1(format).toLower());
-    filesToShow=dir.entryInfoList(nameFilters,QDir::Files,QDir::Name);
+    filesToShow=dir.entryInfoList(nameFilters,QDir::Files,QDir::Name|QDir::IgnoreCase|QDir::LocaleAware);
     currentFile=(filesToShow.isEmpty()) ? filesToShow.constEnd() : filesToShow.constBegin();
 
     // If fileInfo is an actual file (as opposed to a directory), skip straight to the specified file.
