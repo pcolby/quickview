@@ -112,7 +112,6 @@ void MainWindow::zoomTo(const float scale) {
 void MainWindow::zoomToWindow() {
     zoomMode=ZoomToWindow;
     rescale();
-    update();
 }
 
 /* Qt event overrides */
@@ -210,8 +209,10 @@ void MainWindow::paintEvent(QPaintEvent *event) {
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
-    if (zoomMode==ZoomToWindow)
-        rescale();
+    // If the user resized us (as opposed to resizing ourselves programmatically), switch to ZoomToWindow.
+    if (event->spontaneous()) {
+        zoomToWindow();
+    }
     QWidget::resizeEvent(event);
 }
 
