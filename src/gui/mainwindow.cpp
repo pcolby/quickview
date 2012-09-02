@@ -209,9 +209,13 @@ void MainWindow::paintEvent(QPaintEvent *event) {
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
-    // If the user resized us (as opposed to resizing ourselves programmatically), switch to ZoomToWindow.
+    // If the user resized us (as opposed to resizing ourselves programmatically)...
     if (event->spontaneous()) {
-        zoomToWindow();
+        // If we were in explicit-scale mode, switch to zoom-to-window.
+        if (zoomMode==ExplicitScale)
+            zoomToWindow(); // Will rescale when done.
+        else
+            rescale();
     }
     QWidget::resizeEvent(event);
 }
