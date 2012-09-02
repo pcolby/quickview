@@ -36,7 +36,7 @@ class MainWindow : public QWidget { Q_OBJECT
     QRect pixmapRect;
     ZoomMode zoomMode;
     float scale;    ///< Scale to use when zoomMode is ExplicitScale.
-    float scaleMin; ///< Minimum scale to go down to for the current pixmap.
+    float scaleMin; ///< Minimum value for \a scale (calculated by loadImage).
 
     void closeEvent(QCloseEvent *event);
     void keyPressEvent(QKeyEvent *event);   // Remember: widgets should not override keyPressEvent
