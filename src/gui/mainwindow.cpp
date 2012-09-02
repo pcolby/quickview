@@ -7,7 +7,6 @@
 #include <QResizeEvent>
 #include <QSettings>
 
-#define SCALE_MIN 0.0001 //
 #define SCALE_MAX 2048.0 // Enough to make one single pixel fill a 4K screen!!
 
 MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags): QWidget(parent,flags), timerId(0), zoomMode(ZoomToWindow) {
@@ -106,7 +105,7 @@ void MainWindow::zoomOut(const float scale) {
 
 void MainWindow::zoomTo(const float scale) {
     zoomMode=ExplicitScale;
-    this->scale=qBound<float>(SCALE_MIN,scale,SCALE_MAX);
+    this->scale=qBound<float>(scaleMin,scale,SCALE_MAX);
     rescale();
 }
 
@@ -271,7 +270,9 @@ void MainWindow::loadImage(const QFileInfo &fileInfo) {
     const bool wasRunning=pause();
 
     // Load the image.
-    pixmap.load(fileInfo.absoluteFilePath());
+    if (pixmap.load(fileInfo.absoluteFilePath())) {
+        scaleMin=1.0/qMin(pixmap.height(),pixmap.width());
+    }
 
     // Scale, and paint (if necessary) the new image.
     rescale();
