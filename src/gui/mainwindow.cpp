@@ -271,7 +271,9 @@ void MainWindow::loadImage(const QFileInfo &fileInfo) {
 
     // Load the image.
     if (pixmap.load(fileInfo.absoluteFilePath())) {
-        scaleMin=1.0/qMin(pixmap.height(),pixmap.width());
+        scaleMin=16.0/qMin(pixmap.height(),pixmap.width());
+        if (scale<scaleMin)
+            scale=scaleMin;
     }
 
     // Scale, and paint (if necessary) the new image.
