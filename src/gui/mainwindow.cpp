@@ -135,7 +135,8 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_7:
         case Qt::Key_8:
         case Qt::Key_9:        zoomTo(event->key()-Qt::Key_0); break;
-        case Qt::Key_Asterisk: zoomToWindow(); break;
+        case Qt::Key_Asterisk: zoomToWindow();                 break;
+        case Qt::Key_Backslash:zoomToWindow();                 break;
         case Qt::Key_Escape:   close();                        break;
         case Qt::Key_Equal:    zoomOut();                      break;
         case Qt::Key_F:        toggleFullscreen();             break;
@@ -168,6 +169,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
         case Qt::Key_8:
         case Qt::Key_9:
         case Qt::Key_Asterisk:
+    case Qt::Key_Backslash:
         case Qt::Key_Escape:
         case Qt::Key_Equal:
         case Qt::Key_F:
