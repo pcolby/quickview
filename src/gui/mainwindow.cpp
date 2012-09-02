@@ -7,7 +7,10 @@
 #include <QResizeEvent>
 #include <QSettings>
 
-MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags): QWidget(parent,flags), timerId(0) {
+#define SCALE_MIN 0.0001 //
+#define SCALE_MAX 2048.0 // Enough to make one single pixel fill a 4K screen!!
+
+MainWindow::MainWindow(QWidget *parent, Qt::WindowFlags flags): QWidget(parent,flags), timerId(0), zoomMode(ZoomToWindow) {
     setAttribute(Qt::WA_NoSystemBackground,true);
     setAttribute(Qt::WA_OpaquePaintEvent,true);
 
@@ -28,6 +31,7 @@ bool MainWindow::pause() {
         return false; // Was not previously running.
     killTimer(timerId);
     timerId=0;
+    updateWindowTitle();
     return true; // Was previously running.
 }
 
@@ -35,7 +39,12 @@ bool MainWindow::play() {
     if (timerId!=0)
         return true; // Was previously running.
     timerId=startTimer(duration);
+    updateWindowTitle();
     return false; // Was not previously running.
+}
+
+bool MainWindow::playPause() {
+    return (timerId==0) ? play() : pause();
 }
 
 void MainWindow::setDuration(const int duration) {
@@ -73,6 +82,40 @@ int MainWindow::setPath(const QFileInfo &fileInfo) {
     return filesToShow.size();
 }
 
+void MainWindow::shrinkToWindow() {
+    zoomMode=ShrinkToWindow;
+    rescale();
+}
+
+void MainWindow::toggleFullscreen() {
+    if (isFullScreen()) showNormal();
+    else showFullScreen();
+}
+
+void MainWindow::zoomIn(const float scale) {
+    if (zoomMode!=ExplicitScale)
+        this->scale=pixmapScaled.size().height()/static_cast<float>(pixmap.size().height());
+    zoomTo(this->scale*(1.0+scale));
+}
+
+void MainWindow::zoomOut(const float scale) {
+    if (zoomMode!=ExplicitScale)
+        this->scale=pixmapScaled.size().height()/static_cast<float>(pixmap.size().height());
+    zoomTo(this->scale*(1.0-scale));
+}
+
+void MainWindow::zoomTo(const float scale) {
+    zoomMode=ExplicitScale;
+    this->scale=qBound<float>(SCALE_MIN,scale,SCALE_MAX);
+    rescale();
+}
+
+void MainWindow::zoomToWindow() {
+    zoomMode=ZoomToWindow;
+    rescale();
+    update();
+}
+
 /* Qt event overrides */
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -84,49 +127,61 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 void MainWindow::keyPressEvent(QKeyEvent *event) {
     // Remember: widgets should not override keyPressEvent without also overriding keyReleaseEvent accordingly.
     switch (event->key()) {
-        case Qt::Key_Escape: // Exit application.
-            close();
-            break;
-        case Qt::Key_F: // Toggle fullscreen mode.
-            if (isFullScreen())
-                showNormal();
-            else
-                showFullScreen();
-            event->setAccepted(true);
-            break;
-        case Qt::Key_Left:
-        case Qt::Key_Z:
-            loadPreviousImage();
-            break;
-        case Qt::Key_P: // Pause/un-pause the slideshow (ie fall-through).
-        case Qt::Key_S: // Start/stop the slideshow.
-        case Qt::Key_Space: // Advance to the next image.
-            if (timerId==0) // Start.
-                play();
-            else
-                pause();
-            updateWindowTitle();
-            break;
-        case Qt::Key_Right:
-        case Qt::Key_X:
-            loadNextImage();
-            break;
+        case Qt::Key_1:
+        case Qt::Key_2:
+        case Qt::Key_3:
+        case Qt::Key_4:
+        case Qt::Key_5:
+        case Qt::Key_6:
+        case Qt::Key_7:
+        case Qt::Key_8:
+        case Qt::Key_9:        zoomTo(event->key()-Qt::Key_0); break;
+        case Qt::Key_Asterisk: zoomToWindow(); break;
+        case Qt::Key_Escape:   close();                        break;
+        case Qt::Key_Equal:    zoomOut();                      break;
+        case Qt::Key_F:        toggleFullscreen();             break;
+        case Qt::Key_Left:     loadPreviousImage();            break;
+        case Qt::Key_Minus:    zoomOut();                      break;
+        case Qt::Key_P:        playPause();                    break;
+        case Qt::Key_Plus:     zoomIn();                       break;
+        case Qt::Key_Right:    loadNextImage();                break;
+        case Qt::Key_S:        playPause();                    break;
+        case Qt::Key_Slash:    shrinkToWindow();               break;
+        case Qt::Key_Space:    playPause();                    break;
+        case Qt::Key_X:        loadNextImage();                break;
+        case Qt::Key_Z:        loadPreviousImage();            break;
         default:
             QWidget::keyPressEvent(event);
+            return;
     }
+    event->setAccepted(true);
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event) {
     switch (event->key()) {
-        case Qt::Key_Escape: // fall-through.
-        case Qt::Key_F:      // fall-through.
-        case Qt::Key_Left:   // fall-through.
-        case Qt::Key_Z:
-        case Qt::Key_P:      // fall-through.
-        case Qt::Key_S:      // fall-through.
-        case Qt::Key_Space:
+        case Qt::Key_1:
+        case Qt::Key_2:
+        case Qt::Key_3:
+        case Qt::Key_4:
+        case Qt::Key_5:
+        case Qt::Key_6:
+        case Qt::Key_7:
+        case Qt::Key_8:
+        case Qt::Key_9:
+        case Qt::Key_Asterisk:
+        case Qt::Key_Escape:
+        case Qt::Key_Equal:
+        case Qt::Key_F:
+        case Qt::Key_Left:
+        case Qt::Key_P:
+        case Qt::Key_Plus:
+        case Qt::Key_Minus:
         case Qt::Key_Right:
+        case Qt::Key_S:
+        case Qt::Key_Slash:
+        case Qt::Key_Space:
         case Qt::Key_X:
+        case Qt::Key_Z:
             event->setAccepted(true);
             break;
         default:
@@ -135,10 +190,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
 }
 
 void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
-    if (isFullScreen())
-        showNormal();
-    else
-        showFullScreen();
+    toggleFullscreen();
     event->setAccepted(true);
 }
 
@@ -157,7 +209,8 @@ void MainWindow::paintEvent(QPaintEvent *event) {
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
-    scalePixmap();
+    if (zoomMode==ZoomToWindow)
+        rescale();
     QWidget::resizeEvent(event);
 }
 
@@ -220,9 +273,8 @@ void MainWindow::loadImage(const QFileInfo &fileInfo) {
     // Load the image.
     pixmap.load(fileInfo.absoluteFilePath());
 
-    // Scale, and paint the new image.
-    scalePixmap(true);
-    repaint();
+    // Scale, and paint (if necessary) the new image.
+    rescale();
 
     // Re-start the load timer (if we stopped it above).
     if (wasRunning)
@@ -232,7 +284,7 @@ void MainWindow::loadImage(const QFileInfo &fileInfo) {
     updateWindowTitle();
 }
 
-void MainWindow::scalePixmap(const bool force/*=false*/) {
+void MainWindow::rescale() {
     // Special case to handle a null pixmap (in case we have an image load fault).
     if (pixmap.isNull()) {
         if (!pixmapScaled.isNull())
@@ -240,20 +292,27 @@ void MainWindow::scalePixmap(const bool force/*=false*/) {
         return; // Nothing to scale.
     }
 
-    // Check if the image even needs scaling.
-    if ((force!=true)&&(pixmapScaled.size()==size()))
-        return; // Already scaled to the current size.
-
-    // Scale the image (if necessary).
-    if (pixmap.size()==size())
-        pixmapScaled=pixmap; // No need to scale it.
-    else
-        pixmapScaled=pixmap.scaled(size(),Qt::KeepAspectRatio);
+    switch (zoomMode) {
+        case ExplicitScale:
+            Q_ASSERT(scale!=0);
+            pixmapScaled=pixmap.scaled(pixmap.size()*scale,Qt::KeepAspectRatio);
+            if (!isFullScreen())
+                resize(pixmap.size()*scale);
+            break;
+        case ShrinkToWindow:
+            pixmapScaled=((pixmap.size().height()<=size().height()) && (pixmap.size().width()<=size().width()))
+                    ? pixmap : pixmap.scaled(size(),Qt::KeepAspectRatio);
+            break;
+        case ZoomToWindow:
+            pixmapScaled=pixmap.scaled(size(),Qt::KeepAspectRatio);
+            break;
+    }
 
     // Update the pixmapOffset and pixmapRect propeties.
     const int heightDiff=height()-pixmapScaled.height();
     const int widthDiff=width()-pixmapScaled.width();
-    Q_ASSERT((heightDiff>=0)&&(widthDiff>=0));
+    //Q_ASSERT((heightDiff>=0)&&(widthDiff>=0));
     pixmapOffset=QPoint(widthDiff/2,heightDiff/2);           // These two member variables are calculated here
     pixmapRect=pixmapScaled.rect().translated(pixmapOffset); // so that paintEvent can be as fast as possible.
+    update(); // Schedule repaint, unless hidden, etc.
 }
