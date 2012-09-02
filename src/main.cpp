@@ -4,7 +4,6 @@
 #include <QFileDialog>
 #include <QImageReader>
 #include <QInputDialog>
-#include <QMessageBox>
 #include <QSettings>
 
 #define APPLICATION_NAME    QLatin1String("SlideShow")   // Note, these values are used by the

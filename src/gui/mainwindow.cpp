@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QDir>
-#include <QIcon>
 #include <QImageReader>
 #include <QPainter>
 #include <QResizeEvent>
