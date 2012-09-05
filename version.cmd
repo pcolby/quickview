@@ -27,4 +27,4 @@ goto :EOF
 :main
 :: Process all relevant files.
 call:updateFile "%1" "%2" "nsis\win32.nsi"
-call:updateFile "%1" "%2" "qrc\SlideShow.rc0"
+call:updateFile "%1" "%2" "qrc\QuickView.rc0"

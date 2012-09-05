@@ -1,3 +1,3 @@
 DEPENDPATH += src/gui
-HEADERS += mainwindow.h
-SOURCES += mainwindow.cpp
+HEADERS += mainwindow.h   pathdialog.h
+SOURCES += mainwindow.cpp pathdialog.cpp

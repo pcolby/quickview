@@ -6,7 +6,7 @@
 #include <QInputDialog>
 #include <QSettings>
 
-#define APPLICATION_NAME    QLatin1String("SlideShow")   // Note, these values are used by the
+#define APPLICATION_NAME    QLatin1String("QuickView")   // Note, these values are used by the
 #define ORGANISATION_NAME   QLatin1String("Paul Colby")  // QSettings default constructor, so
 #define ORGANISATION_DOMAIN QLatin1String("colby.id.au") // should not change between versions.
 

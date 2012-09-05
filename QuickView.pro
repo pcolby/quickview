@@ -1,5 +1,5 @@
-# Make an application called SlideShow
-TARGET = SlideShow
+# Make an application called QuickView
+TARGET = QuickView
 TEMPLATE = app
 
 # Disable automatic ASCII conversions (best practice, especially for i18n support).
@@ -9,7 +9,7 @@ DEFINES += QT_NO_CAST_FROM_ASCII QT_NO_CAST_TO_ASCII
 CONFIG(debug,debug|release):DEFINES+=DEBUG
 
 # Set the dependancies.
-win32:RC_FILE=qrc/SlideShow.rc
+win32:RC_FILE=qrc/QuickView.rc
 include(src/src.pri)
 
 # Neaten the output directories.
@@ -28,7 +28,7 @@ CONFIG(release,debug|release) {
 win32:LIBS += -lversion
 
 # Optionally, create our custom svnbuild target.
-win32:svnbuild.commands = qrc\\svnversion.cmd . qrc\\SlideShow.rc0 qrc\\SlideShow.rc
+win32:svnbuild.commands = qrc\\svnversion.cmd . qrc\\QuickView.rc0 qrc\\QuickView.rc
 QMAKE_EXTRA_TARGETS += svnbuild
 
 # Hook our optional svnbuild target in between qmake's Makefile update and the actual project target.
