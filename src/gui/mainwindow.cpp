@@ -258,11 +258,7 @@ void MainWindow::updateWindowTitle() {
     title += QApplication::applicationName() + QLatin1Char(' ');
 
     // Include the version string.
-    #ifdef DEBUG
-    QRegExp versionMatch(QLatin1String("([^.]+\\.[^.]+\\.[^.]+\\.[^.]+)"));
-    #else
     QRegExp versionMatch(QLatin1String("([^.]+\\.[^.]+\\.[^.]+)\\."));
-    #endif // DEBUG
     title +=(QApplication::applicationVersion().contains(versionMatch)) ? versionMatch.cap(1) : QApplication::applicationVersion();
 
     // Set the window title.
