@@ -4,7 +4,7 @@
 # Installer Attributes: General Attributes.
 InstallDir "$PROGRAMFILES\SlideShow"
 Name "SlideShow"
-OutFile SlideShow-0.0.1.0.exe
+OutFile SlideShow-0.1.0.0.exe
 RequestExecutionLevel highest # Required for Windows Vista+
 XPStyle on
 
@@ -56,9 +56,9 @@ Section "SlideShow"
     CreateShortCut "$DESKTOP\SlideShow.lnk" "$INSTDIR\SlideShow.exe"
   !insertmacro MUI_STARTMENU_WRITE_END
   # Windows' add/remove programs information.
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SlideShow" "DisplayName" "SlideShow 0.0.1.0"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SlideShow" "DisplayName" "SlideShow 0.1.0.0"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SlideShow" "DisplayIcon" "$\"$INSTDIR\slideshow.exe$\",0"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SlideShow" "DisplayVersion" "0.0.1.0"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SlideShow" "DisplayVersion" "0.1.0.0"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SlideShow" "Publisher" "Paul Colby"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SlideShow" "URLInfoAbout" "http://colby.id.au/"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\SlideShow" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
@@ -89,16 +89,16 @@ Section "uninstall"
 SectionEnd
 
 # Installer Attributes: Version Information.
-VIProductVersion "0.0.1.0"
+VIProductVersion "0.1.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "SlideShow"
 #VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "..."
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Paul Colby"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "(c) 2009"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "SlideShow installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "0.0.1.0"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "0.0.1.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "0.1.0.0"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "0.1.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "InternalName" "SlideShow"
 #VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalTrademarks" ""
-VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "SlideShow-0.0.1.0.exe"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "OriginalFilename" "SlideShow-0.1.0.0.exe"
 #VIAddVersionKey /LANG=${LANG_ENGLISH} "PrivateBuild" ""
 #VIAddVersionKey /LANG=${LANG_ENGLISH} "SpecialBuild" ""
