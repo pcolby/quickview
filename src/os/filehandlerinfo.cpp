@@ -36,9 +36,8 @@ bool FileHandlerInfo::isOpenWithDefault(const QString &extension) {
     return (settings.value(QString::fromLatin1(".%1\\Default").arg(extension)) == programId(extension));
 }
 
-// Note, this will not override values set in
-// Software/Microsoft/Windows/CurrentVersion/Explorer/FileExts/.%1/UserChoice/Progid, no will Windows
-// let us do so.
+// Note, this will not override values set in Software/Microsoft/Windows/CurrentVersion/Explorer/FileExts/.%1/UserChoice/Progid,
+// nor will Windows let us do so.
 bool FileHandlerInfo::enableOpenWith(const QString &extension, const UserScope scope) {
     const QString programId(FileHandlerInfo::programId(extension));
     QSettings settings((scope == AllUsers) ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER, QSettings::NativeFormat);
@@ -65,6 +64,40 @@ bool FileHandlerInfo::setOpenWithDefault(const QString &extension, const UserSco
     settings.setValue(QString::fromLatin1("SOFTWARE/Classes/.%1/Default").arg(extension), programId(extension));
     return true;
 }
+
+void FileHandlerInfo::clearOpenWithDefault(const QString &extension) {
+    clearOpenWithDefault(extension, AllUsers);
+    clearOpenWithDefault(extension, CurrentUser);
+}
+
+void FileHandlerInfo::clearOpenWithDefault(const QString &extension, const UserScope scope) {
+    // If our program ID is the default for this extension, clear it.
+    QSettings settings((scope == AllUsers) ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER, QSettings::NativeFormat);
+    if (settings.value(QString::fromLatin1("SOFTWARE/Classes/.%1/Default").arg(extension)) == programId(extension))
+        settings.remove(QString::fromLatin1("SOFTWARE/Classes/.%1/Default").arg(extension));
+}
+
+
+void FileHandlerInfo::disableOpenWith(const QString &extension) {
+    disableOpenWith(extension, AllUsers);
+    disableOpenWith(extension, CurrentUser);
+}
+
+void FileHandlerInfo::disableOpenWith(const QString &extension, const UserScope scope) {
+    const QString programId(FileHandlerInfo::programId(extension));
+    QSettings settings((scope == AllUsers) ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER, QSettings::NativeFormat);
+
+    // Ensure we're not the default open-with handler for this extension.
+    clearOpenWithDefault(extension, scope);
+
+    // Remove our program ID from the open-with-progIDs list.
+    settings.remove(QString::fromLatin1("SOFTWARE/Classes/.%1/OpenWithProgids/%2").arg(extension, programId));
+
+    // Remove our program ID class.
+    settings.remove(QString::fromLatin1("SOFTWARE/Classes/%1").arg(programId));
+}
+
+/* Protected methods */
 
 QString FileHandlerInfo::defaultIcon(const QString &extension) {
     /*// Use Window's default icon for the given file type.

@@ -14,6 +14,10 @@ class FileHandlerInfo {
     static bool isOpenWithDefault(const QString &extension);
     static bool enableOpenWith(const QString &extension, const UserScope scope = CurrentUser);
     static bool setOpenWithDefault(const QString &extension, const UserScope scope = CurrentUser);
+    static void clearOpenWithDefault(const QString &extension);
+    static void clearOpenWithDefault(const QString &extension, const UserScope scope);
+    static void disableOpenWith(const QString &extension);
+    static void disableOpenWith(const QString &extension, const UserScope scope);
 
   protected:
     static QString defaultIcon(const QString &extension);

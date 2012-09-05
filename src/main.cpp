@@ -39,6 +39,13 @@ int main(int argc, char *argv[]) {
             FileHandlerInfo::enableOpenWith(QString::fromLatin1(format).toLower(), userScope);
         }
         return 0;
+    } else if (app.arguments().indexOf(QLatin1String("-remove-open-with")) != -1) {
+        foreach (QByteArray format, formats) {
+            FileHandlerInfo::disableOpenWith(QString::fromLatin1(format).toLower(), userScope);
+            if (userScope == FileHandlerInfo::AllUsers)
+                FileHandlerInfo::disableOpenWith(QString::fromLatin1(format).toLower(), FileHandlerInfo::CurrentUser);
+        }
+        return 0;
     }
 #endif
 
