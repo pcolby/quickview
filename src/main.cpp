@@ -1,4 +1,6 @@
 #include "gui/mainwindow.h"
+#include "gui/optionswizard.h"
+//#include "gui/pathdialog.h"
 #include "os/versioninfo.h"
 #include <QApplication>
 #include <QFileDialog>
@@ -48,6 +50,10 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 #endif
+
+    OptionsWizard wizard;
+    wizard.exec();
+    return 0;
 
     // Find the first argument that identifies an existing file or directory.
     QFileInfo fileInfo;
