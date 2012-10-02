@@ -51,10 +51,6 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    OptionsWizard wizard;
-    wizard.exec();
-    return 0;
-
     // Find the first argument that identifies an existing file or directory.
     QFileInfo fileInfo;
     for (int index=1; (!fileInfo.exists()) && (index < app.arguments().size()); ++index) {
@@ -66,11 +62,13 @@ int main(int argc, char *argv[]) {
 
     // Prompt for the directory to show images from.
     if (!fileInfo.exists()) {
-        QString dirName=settings.value(QLatin1String("directory")).toString();
-        dirName=QFileDialog::getExistingDirectory(0,QObject::tr("Open Images Directory"),dirName);
-        if (dirName.isEmpty()) return 1;
-        settings.setValue(QLatin1String("directory"),dirName);
-        fileInfo=QFileInfo(dirName);
+        OptionsWizard wizard;
+        if (wizard.exec() == QWizard::Rejected)
+            return 1;
+        fileInfo=QFileInfo(wizard.field(OptionsWizard::PathNameField).toString());
+        Q_ASSERT(fileInfo.exists());
+
+        /// @todo  Get the following from the wizard too... or QSettings directly?
 
         // Prompt for the image duration, unless a file was specified on the command line.
         bool ok;

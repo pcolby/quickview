@@ -1,4 +1,5 @@
 #include "viewoptionspage.h"
+#include "settings.h"
 #include <QComboBox>
 #include <QFormLayout>
 #include <QLabel>
@@ -8,7 +9,7 @@
 
 ViewOptionsPage::ViewOptionsPage(QWidget *parent): QWizardPage(parent) {
     setTitle(tr("View Options"));
-    setSubTitle(tr(".. subtitle goes here."));
+    setSubTitle(tr("Choose how the images should be shown."));
 
     QFormLayout *layout=new QFormLayout;
 
@@ -28,4 +29,8 @@ ViewOptionsPage::ViewOptionsPage(QWidget *parent): QWizardPage(parent) {
     layout->addRow(tr("Zoom mode:"), zoomModeLayout);
 
     setLayout(layout);
+}
+
+void ViewOptionsPage::save() {
+
 }

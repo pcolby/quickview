@@ -4,11 +4,15 @@
 #include <QFileDialog>
 #include <QWizardPage>
 
-class PathPage : public QWizardPage { Q_OBJECT
+class PathPage : public QWizardPage {
+    Q_OBJECT
+
   public:
     PathPage(QWidget *parent=0);
     virtual bool isComplete() const;
-    //virtual bool isComplete(const QString &pathName) const;
+
+  public slots:
+    void save();
 
   protected:
     QFileDialog * fileDialog;

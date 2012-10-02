@@ -2,6 +2,10 @@
 #include "pathpage.h"
 #include "viewoptionspage.h"
 #include <QApplication>
+#include <QMessageBox>
+#include <QVariant>
+
+const QString OptionsWizard::PathNameField(QString::fromLatin1("abc"));
 
 OptionsWizard::OptionsWizard(QWidget *parent, Qt::WindowFlags flags): QWizard(parent,flags) {
     setWindowTitle(QString::fromLatin1("%1 %2").arg(QApplication::applicationName())
@@ -20,4 +24,7 @@ OptionsWizard::OptionsWizard(QWidget *parent, Qt::WindowFlags flags): QWizard(pa
     setOption(NoBackButtonOnStartPage, false);
     //setOption(DisabledBackButtonOnLastPage, false);//, true);
     setOption(NoDefaultButton);
+
+    connect(this, SIGNAL(accepted()), pathPage, SLOT(save()));
+    connect(this, SIGNAL(accepted()), viewOptionsPage, SLOT(save()));
 }

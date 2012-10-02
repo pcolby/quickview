@@ -1,8 +1,10 @@
 #include "pathpage.h"
+#include "settings.h"
 #include <QHBoxLayout>
 #include <QImageReader>
-#include <QMessageBox>
+#include <QSettings>
 #include <QTimer>
+#include <QVariant>
 
 PathPage::PathPage(QWidget *parent): QWizardPage(parent), fileDialog(NULL) {
     setTitle(tr("Select Path To Show"));
@@ -16,7 +18,7 @@ PathPage::PathPage(QWidget *parent): QWizardPage(parent), fileDialog(NULL) {
     filters.sort();
     QString filter = QString::fromLatin1("Images (%1)").arg(filters.join(QLatin1String(" ")));
 
-    fileDialog = new QFileDialog(0, tr("blah"), tr("D:\\"), filter);
+    fileDialog = new QFileDialog(0, QString(), QString(), filter);
     fileDialog->setFileMode(QFileDialog::Directory);
     fileDialog->setOption(QFileDialog::ReadOnly);
 
@@ -30,6 +32,12 @@ PathPage::PathPage(QWidget *parent): QWizardPage(parent), fileDialog(NULL) {
             qobject_cast<QWidget *>(child)->setVisible(false);
     }
     layout->addWidget(fileDialog);
+
+    QSettings settings;
+    QVariant pathName = settings.value(PathNameSetting);
+    if (pathName.isValid()) {
+        fileDialog->selectFile(pathName.toString());
+    }
 
     setLayout(layout);
 
@@ -55,7 +63,14 @@ bool PathPage::isComplete() const {
     return (!dir.entryList(nameFilters,QDir::Files,QDir::Unsorted).isEmpty());
 }
 
+void PathPage::save() {
+    QSettings settings;
+    settings.setValue(PathNameSetting, QDir::toNativeSeparators(fileDialog->selectedFiles().first()));
+}
+
 void PathPage::pathSelected(const QString &path) {
+    Q_UNUSED(path)
+
     // Give the dialog time to update before emitting the completeChanged signal.
     QTimer::singleShot(0, this, SLOT(emitCompleteChanged()));
 }
