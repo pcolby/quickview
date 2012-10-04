@@ -27,4 +27,6 @@ OptionsWizard::OptionsWizard(QWidget *parent, Qt::WindowFlags flags): QWizard(pa
 
     connect(this, SIGNAL(accepted()), pathPage, SLOT(save()));
     connect(this, SIGNAL(accepted()), viewOptionsPage, SLOT(save()));
+
+    next();
 }

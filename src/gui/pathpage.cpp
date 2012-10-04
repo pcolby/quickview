@@ -34,7 +34,7 @@ PathPage::PathPage(QWidget *parent): QWizardPage(parent), fileDialog(NULL) {
     layout->addWidget(fileDialog);
 
     QSettings settings;
-    QVariant pathName = settings.value(PathNameSetting);
+    QVariant pathName = settings.value(Setting::PathName);
     if (pathName.isValid()) {
         fileDialog->selectFile(pathName.toString());
     }
@@ -65,7 +65,7 @@ bool PathPage::isComplete() const {
 
 void PathPage::save() {
     QSettings settings;
-    settings.setValue(PathNameSetting, QDir::toNativeSeparators(fileDialog->selectedFiles().first()));
+    settings.setValue(Setting::PathName, QDir::toNativeSeparators(fileDialog->selectedFiles().first()));
 }
 
 void PathPage::pathSelected(const QString &path) {

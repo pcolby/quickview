@@ -1,11 +1,9 @@
 #include "gui/mainwindow.h"
 #include "gui/optionswizard.h"
-//#include "gui/pathdialog.h"
 #include "os/versioninfo.h"
+#include "settings.h"
 #include <QApplication>
-#include <QFileDialog>
 #include <QImageReader>
-#include <QInputDialog>
 #include <QSettings>
 
 #define APPLICATION_NAME    QLatin1String("QuickView")   // Note, these values are used by the
@@ -57,30 +55,19 @@ int main(int argc, char *argv[]) {
         fileInfo = QFileInfo(app.arguments().at(index));
     }
 
-    QSettings settings;
-    int duration=settings.value(QLatin1String("duration"),4000).toInt();
-
     // Prompt for the directory to show images from.
+    QSettings settings;
     if (!fileInfo.exists()) {
         OptionsWizard wizard;
         if (wizard.exec() == QWizard::Rejected)
             return 1;
-        fileInfo=QFileInfo(wizard.field(OptionsWizard::PathNameField).toString());
+        fileInfo=QFileInfo(settings.value(Setting::PathName).toString());
         Q_ASSERT(fileInfo.exists());
-
-        /// @todo  Get the following from the wizard too... or QSettings directly?
-
-        // Prompt for the image duration, unless a file was specified on the command line.
-        bool ok;
-        duration=QInputDialog::getInt(0,QObject::tr("Duration"),QObject::tr("How long (in milliseonds) should each image display for?"),
-                                      duration,100,2147483647,1,&ok);
-        if (!ok) return 3;
-        settings.setValue(QLatin1String("duration"),duration);
     }
 
     // Instantiate the main window.
     MainWindow *mainWindow=new MainWindow;
-    mainWindow->setDuration(duration);
+    mainWindow->setDuration(settings.value(Setting::SlideShowDuration, 4000).toInt());
     mainWindow->setPath(fileInfo);
     mainWindow->show();
     return app.exec();
