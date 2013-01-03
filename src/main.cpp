@@ -1,5 +1,6 @@
 #include "gui/mainwindow.h"
 #include "gui/optionswizard.h"
+#include "os/filehandlerinfo.h"
 #include "os/versioninfo.h"
 #include "settings.h"
 #include <QApplication>

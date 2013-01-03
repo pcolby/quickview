@@ -24,11 +24,11 @@ PathPage::PathPage(QWidget *parent): QWizardPage(parent), fileDialog(NULL) {
 
     foreach (QObject * const child, fileDialog->children()) {
         const QLatin1String childClassName(child->metaObject()->className());
-        if ((childClassName == "QDialogButtonBox") || (childClassName == "QSizeGrip"))
+        if ((childClassName == QLatin1String("QDialogButtonBox")) || (childClassName == QLatin1String("QSizeGrip")))
             qobject_cast<QWidget *>(child)->setVisible(false);
-        else if ((childClassName == "QLabel") && (child->objectName() == QLatin1String("fileTypeLabel")))
+        else if ((childClassName == QLatin1String("QLabel")) && (child->objectName() == QLatin1String("fileTypeLabel")))
             qobject_cast<QWidget *>(child)->setVisible(false);
-        else if ((childClassName == "QComboBox") && (child->objectName() == QLatin1String("fileTypeCombo")))
+        else if ((childClassName == QLatin1String("QComboBox")) && (child->objectName() == QLatin1String("fileTypeCombo")))
             qobject_cast<QWidget *>(child)->setVisible(false);
     }
     layout->addWidget(fileDialog);
