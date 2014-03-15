@@ -9,8 +9,8 @@ it comes to obfuscating real content with useless UI chrome).
 
 When viewing images:
 
-| Key | Action  |
-|-------------------|---------|
+| Key(s)            | Action |
+|-------------------|--------|
 | `+`, `=`          | Zoom in (`=` so you don't _have_ to press `Shift`) |
 | `-`               | Zoom out |
 | `\`, `*`          | Zoom to window (aka Zoom to fit) |
