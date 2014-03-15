@@ -155,7 +155,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_Asterisk: zoomToWindow();                 break;
         case Qt::Key_Backslash:zoomToWindow();                 break;
         case Qt::Key_Escape:   close();                        break;
-        case Qt::Key_Equal:    zoomOut();                      break;
+        case Qt::Key_Equal:    zoomIn();                       break;
         case Qt::Key_F:        toggleFullscreen();             break;
         case Qt::Key_Left:     loadPreviousImage();            break;
         case Qt::Key_Minus:    zoomOut();                      break;
