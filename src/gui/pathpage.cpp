@@ -22,6 +22,7 @@
 #include <QHBoxLayout>
 #include <QImageReader>
 #include <QSettings>
+#include <QShowEvent>
 #include <QTimer>
 #include <QVariant>
 
@@ -78,14 +79,16 @@ void PathPage::save() {
 }
 
 void PathPage::showEvent(QShowEvent *event) {
-    foreach (QObject * const child, fileDialog->children()) {
-        const QLatin1String childClassName(child->metaObject()->className());
-        if ((childClassName == QLatin1String("QDialogButtonBox")) || (childClassName == QLatin1String("QSizeGrip")))
-            qobject_cast<QWidget *>(child)->setVisible(false);
-        else if ((childClassName == QLatin1String("QLabel")) && (child->objectName() == QLatin1String("fileTypeLabel")))
-            qobject_cast<QWidget *>(child)->setVisible(false);
-        else if ((childClassName == QLatin1String("QComboBox")) && (child->objectName() == QLatin1String("fileTypeCombo")))
-            qobject_cast<QWidget *>(child)->setVisible(false);
+    if (!event->spontaneous()) {
+        foreach (QObject * const child, fileDialog->children()) {
+            const QLatin1String childClassName(child->metaObject()->className());
+            if ((childClassName == QLatin1String("QDialogButtonBox")) || (childClassName == QLatin1String("QSizeGrip")))
+                qobject_cast<QWidget *>(child)->setVisible(false);
+            else if ((childClassName == QLatin1String("QLabel")) && (child->objectName() == QLatin1String("fileTypeLabel")))
+                qobject_cast<QWidget *>(child)->setVisible(false);
+            else if ((childClassName == QLatin1String("QComboBox")) && (child->objectName() == QLatin1String("fileTypeCombo")))
+                qobject_cast<QWidget *>(child)->setVisible(false);
+        }
     }
 }
 
