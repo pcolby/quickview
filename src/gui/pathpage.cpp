@@ -89,13 +89,13 @@ void PathPage::showEvent(QShowEvent *event) {
     }
 }
 
+void PathPage::emitCompleteChanged() {
+    emit completeChanged();
+}
+
 void PathPage::pathSelected(const QString &path) {
     Q_UNUSED(path)
 
     // Give the dialog time to update before emitting the completeChanged signal.
     QTimer::singleShot(0, this, SLOT(emitCompleteChanged()));
-}
-
-void PathPage::emitCompleteChanged() {
-    emit completeChanged();
 }
