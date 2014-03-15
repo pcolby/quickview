@@ -28,7 +28,7 @@ CONFIG(release,debug|release) {
 win32:LIBS += -lversion
 
 # Optionally, create our custom svnbuild target.
-win32:svnbuild.commands = qrc\\svnversion.cmd . qrc\\QuickView.rc0 qrc\\QuickView.rc
+win32:svnbuild.commands = qrc\\gitrevision.cmd qrc\\QuickView.rc0 qrc\\QuickView.rc
 QMAKE_EXTRA_TARGETS += svnbuild
 
 # Hook our optional svnbuild target in between qmake's Makefile update and the actual project target.
