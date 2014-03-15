@@ -36,6 +36,8 @@ class PathPage : public QWizardPage {
   protected:
     QFileDialog * fileDialog;
 
+    virtual void showEvent(QShowEvent *event);
+
   protected slots:
     void emitCompleteChanged();
     void pathSelected(const QString &path);

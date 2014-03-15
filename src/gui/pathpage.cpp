@@ -40,16 +40,6 @@ PathPage::PathPage(QWidget *parent): QWizardPage(parent), fileDialog(NULL) {
     fileDialog = new QFileDialog(0, QString(), QString(), filter);
     fileDialog->setFileMode(QFileDialog::Directory);
     fileDialog->setOption(QFileDialog::ReadOnly);
-
-    foreach (QObject * const child, fileDialog->children()) {
-        const QLatin1String childClassName(child->metaObject()->className());
-        if ((childClassName == QLatin1String("QDialogButtonBox")) || (childClassName == QLatin1String("QSizeGrip")))
-            qobject_cast<QWidget *>(child)->setVisible(false);
-        else if ((childClassName == QLatin1String("QLabel")) && (child->objectName() == QLatin1String("fileTypeLabel")))
-            qobject_cast<QWidget *>(child)->setVisible(false);
-        else if ((childClassName == QLatin1String("QComboBox")) && (child->objectName() == QLatin1String("fileTypeCombo")))
-            qobject_cast<QWidget *>(child)->setVisible(false);
-    }
     layout->addWidget(fileDialog);
 
     QSettings settings;
@@ -85,6 +75,18 @@ bool PathPage::isComplete() const {
 void PathPage::save() {
     QSettings settings;
     settings.setValue(Setting::PathName, QDir::toNativeSeparators(fileDialog->selectedFiles().first()));
+}
+
+void PathPage::showEvent(QShowEvent *event) {
+    foreach (QObject * const child, fileDialog->children()) {
+        const QLatin1String childClassName(child->metaObject()->className());
+        if ((childClassName == QLatin1String("QDialogButtonBox")) || (childClassName == QLatin1String("QSizeGrip")))
+            qobject_cast<QWidget *>(child)->setVisible(false);
+        else if ((childClassName == QLatin1String("QLabel")) && (child->objectName() == QLatin1String("fileTypeLabel")))
+            qobject_cast<QWidget *>(child)->setVisible(false);
+        else if ((childClassName == QLatin1String("QComboBox")) && (child->objectName() == QLatin1String("fileTypeCombo")))
+            qobject_cast<QWidget *>(child)->setVisible(false);
+    }
 }
 
 void PathPage::pathSelected(const QString &path) {
