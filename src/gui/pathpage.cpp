@@ -26,7 +26,7 @@
 #include <QTimer>
 #include <QVariant>
 
-PathPage::PathPage(QWidget *parent): QWizardPage(parent), fileDialog(NULL) {
+PathPage::PathPage(QWidget *parent): QWizardPage(parent), fileDialog(NULL), haveSelection(false) {
     setTitle(tr("Select Path To Show"));
     setSubTitle(tr("Select the path to show images from."));
 
@@ -56,7 +56,7 @@ PathPage::PathPage(QWidget *parent): QWizardPage(parent), fileDialog(NULL) {
 }
 
 bool PathPage::isComplete() const {
-    if (fileDialog == 0) return false;
+    if (!haveSelection) return false;
 
     const QStringList selectedFiles = fileDialog->selectedFiles();
     if (selectedFiles.isEmpty()) return false;
@@ -79,15 +79,29 @@ void PathPage::save() {
 }
 
 void PathPage::showEvent(QShowEvent *event) {
+    QWizardPage::showEvent(event);
+
     if (!event->spontaneous()) {
+        fileDialog->setSizeGripEnabled(false);
+
+        QGridLayout * layout = NULL;
         foreach (QObject * const child, fileDialog->children()) {
             const QLatin1String childClassName(child->metaObject()->className());
-            if ((childClassName == QLatin1String("QDialogButtonBox")) || (childClassName == QLatin1String("QSizeGrip")))
+
+            if (childClassName == QLatin1String("QGridLayout")) {
+                layout = qobject_cast<QGridLayout *>(child);
+            }
+
+            if ((childClassName == QLatin1String("QComboBox"))        ||
+                (childClassName == QLatin1String("QDialogButtonBox")) ||
+                (childClassName == QLatin1String("QLabel"))           ||
+                (childClassName == QLatin1String("QLineEdit"))        ||
+                (childClassName == QLatin1String("QToolButton"))) {
                 qobject_cast<QWidget *>(child)->setVisible(false);
-            else if ((childClassName == QLatin1String("QLabel")) && (child->objectName() == QLatin1String("fileTypeLabel")))
-                qobject_cast<QWidget *>(child)->setVisible(false);
-            else if ((childClassName == QLatin1String("QComboBox")) && (child->objectName() == QLatin1String("fileTypeCombo")))
-                qobject_cast<QWidget *>(child)->setVisible(false);
+                if (layout != NULL) {
+                    layout->removeWidget(qobject_cast<QWidget *>(child));
+                }
+            }
         }
     }
 }
@@ -98,6 +112,8 @@ void PathPage::emitCompleteChanged() {
 
 void PathPage::pathSelected(const QString &path) {
     Q_UNUSED(path)
+
+    haveSelection = (!path.isEmpty());
 
     // Give the dialog time to update before emitting the completeChanged signal.
     QTimer::singleShot(0, this, SLOT(emitCompleteChanged()));

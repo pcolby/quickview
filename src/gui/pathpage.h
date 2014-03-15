@@ -35,6 +35,7 @@ class PathPage : public QWizardPage {
 
   protected:
     QFileDialog * fileDialog;
+    bool haveSelection;
 
     virtual void showEvent(QShowEvent *event);
 
