@@ -20,15 +20,7 @@ When viewing images:
 | `Right`, `x`      | Next image |
 | `P`, `S`, `Space` | Play / Pause (aka Start / Stop) the slideshow |
 | `Esc`             | Close the application |
-| `1`               | Zoom to 100% |
-| `2`               | Zoom to 200% |
-| `3`               | Zoom to 300% |
-| `4`               | Zoom to 400% |
-| `5`               | Zoom to 500% |
-| `6`               | Zoom to 600% |
-| `7`               | Zoom to 700% |
-| `8`               | Zoom to 800% |
-| `9`               | Zoom to 900% |
+| `1`, `2`, ... `9` | Zoom to 100%, 200%, ... 900% |
 
 ## License
 
