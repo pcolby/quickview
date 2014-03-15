@@ -186,7 +186,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
         case Qt::Key_8:
         case Qt::Key_9:
         case Qt::Key_Asterisk:
-    case Qt::Key_Backslash:
+        case Qt::Key_Backslash:
         case Qt::Key_Escape:
         case Qt::Key_Equal:
         case Qt::Key_F:
