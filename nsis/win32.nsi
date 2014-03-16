@@ -102,9 +102,9 @@ SectionEnd
 # Installer Attributes: Version Information.
 VIProductVersion "0.1.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "QuickView"
-#VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "..."
+VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "https://github.com/pcolby/quickview"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Paul Colby"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "(c) 2014"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "2009-2014 Paul Colby"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "QuickView installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "0.1.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "0.1.0.0"
