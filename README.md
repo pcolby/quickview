@@ -15,7 +15,7 @@ When viewing images:
 | `-`               | Zoom out |
 | `\`, `*`          | Zoom to window (aka Zoom to fit) |
 | `/`               | Shrink to window (aka Shrink to fit) |
-| `F`               | Toggle full-screen mode |
+| `F`, `F11`        | Toggle full-screen mode |
 | `Left`, `z`       | Previous image |
 | `Right`, `x`      | Next image |
 | `P`, `S`, `Space` | Play / Pause (aka Start / Stop) the slideshow |

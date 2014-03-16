@@ -157,6 +157,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_Escape:   close();                        break;
         case Qt::Key_Equal:    zoomIn();                       break;
         case Qt::Key_F:        toggleFullscreen();             break;
+        case Qt::Key_F11:      toggleFullscreen();             break;
         case Qt::Key_Left:     loadPreviousImage();            break;
         case Qt::Key_Minus:    zoomOut();                      break;
         case Qt::Key_P:        playPause();                    break;
@@ -190,6 +191,7 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event) {
         case Qt::Key_Escape:
         case Qt::Key_Equal:
         case Qt::Key_F:
+        case Qt::Key_F11:
         case Qt::Key_Left:
         case Qt::Key_P:
         case Qt::Key_Plus:
