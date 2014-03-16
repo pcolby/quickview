@@ -27,6 +27,7 @@ Var StartMenuFolder
 
 # Modern UI2 Install Pages.
 !insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_LICENSE "gpl-3.0.rtf"
 !insertmacro MUI_PAGE_DIRECTORY
 
 #!insertmacro MUI_PAGE_COMPONENTS
