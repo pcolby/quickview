@@ -4,7 +4,7 @@
 Features:
 - renamed to QuickView
 - Windows Explorer integration
-- Qt 5.x (msvc)
+- Qt 5.x (msvc2012)
 
 ### 0.0.1 (2011-07-23)
 Features:
