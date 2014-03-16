@@ -8,6 +8,7 @@ InstallDir "$PROGRAMFILES\QuickView"
 Name "QuickView"
 OutFile QuickView-0.1.0.0.exe
 RequestExecutionLevel highest # Required for Windows Vista+
+SetCompressor lzma
 XPStyle on
 
 # Variables.
