@@ -1,4 +1,5 @@
 !define QTDIR "C:\Qt\5.2.0\msvc2012"
+!define VCRDIR "C:\Windows\System32"
 
 # Include the NSIS Modern UI 2.
 !include "MUI2.nsh"
@@ -42,6 +43,8 @@ Var StartMenuFolder
 Section "QuickView"
   # Files to install.
   SetOutPath $INSTDIR
+  File "${VCRDIR}\msvcp110.dll"
+  File "${VCRDIR}\msvcr110.dll"
   File "${QTDIR}\bin\icu*51.dll"
   File "${QTDIR}\bin\libEGL.dll"
   File "${QTDIR}\bin\libGLESv2.dll"
@@ -82,6 +85,8 @@ Section "uninstall"
   Delete "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk"
   Delete "$SMPROGRAMS\$StartMenuFolder\QuickView.lnk"
   RMDir "$SMPROGRAMS\$StartMenuFolder"
+  Delete $INSTDIR\msvcp110.dll
+  Delete $INSTDIR\msvcr110.dll
   Delete $INSTDIR\icu*51.dll
   Delete $INSTDIR\libEGL.dll
   Delete $INSTDIR\libGLESv2.dll
