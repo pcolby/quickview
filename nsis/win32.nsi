@@ -1,3 +1,5 @@
+!define QTDIR "C:\Qt\5.2.0\msvc2012"
+
 # Include the NSIS Modern UI 2.
 !include "MUI2.nsh"
 
@@ -39,13 +41,17 @@ Var StartMenuFolder
 Section "QuickView"
   # Files to install.
   SetOutPath $INSTDIR
-  File "C:\QtSDK\Desktop\Qt\4.7.3\MinGW\bin\libgcc_s_dw2-1.dll"
-  File "C:\QtSDK\Desktop\Qt\4.7.3\MinGW\bin\mingwm10.dll"
-  File "C:\QtSDK\Desktop\Qt\4.7.3\MinGW\lib\QtCore4.dll"
-  File "C:\QtSDK\Desktop\Qt\4.7.3\MinGW\lib\QtGui4.dll"
+  File "${QTDIR}\bin\icu*51.dll"
+  File "${QTDIR}\bin\libEGL.dll"
+  File "${QTDIR}\bin\libGLESv2.dll"
+  File "${QTDIR}\bin\Qt5Core.dll"
+  File "${QTDIR}\bin\Qt5Gui.dll"
+  File "${QTDIR}\bin\Qt5Widgets.dll"
   File "..\release\QuickView.exe"
   SetOutPath $INSTDIR\imageformats
-  File /x "*d?.dll" "C:\QtSDK\Desktop\Qt\4.7.3\MinGW\plugins\imageformats\*.dll"
+  File /x "*d?.dll" "${QTDIR}\plugins\imageformats\*.dll"
+  SetOutPath $INSTDIR\platforms
+  File /x "*d.dll" "${QTDIR}\plugins\platforms\*.dll"
   WriteRegStr HKCU "Software\Software\Paul Colby\QuickView" "" $INSTDIR
   WriteUninstaller $INSTDIR\Uninstall.exe
   # The various shortcuts.
@@ -60,7 +66,7 @@ Section "QuickView"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\QuickView" "DisplayIcon" "$\"$INSTDIR\QuickView.exe$\",0"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\QuickView" "DisplayVersion" "0.1.0.0"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\QuickView" "Publisher" "Paul Colby"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\QuickView" "URLInfoAbout" "http://colby.id.au/"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\QuickView" "URLInfoAbout" "https://github.com/pcolby/quickview"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\QuickView" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\QuickView" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
   WriteRegDword HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\QuickView" "NoModify" 1
@@ -75,14 +81,18 @@ Section "uninstall"
   Delete "$SMPROGRAMS\$StartMenuFolder\Uninstall.lnk"
   Delete "$SMPROGRAMS\$StartMenuFolder\QuickView.lnk"
   RMDir "$SMPROGRAMS\$StartMenuFolder"
-  Delete $INSTDIR\libgcc_s_dw2-1.dll
-  Delete $INSTDIR\msvcr90.dll
-  Delete $INSTDIR\QtCore4.dll
-  Delete $INSTDIR\QtGui4.dll
+  Delete $INSTDIR\icu*51.dll
+  Delete $INSTDIR\libEGL.dll
+  Delete $INSTDIR\libGLESv2.dll
+  Delete $INSTDIR\Qt5Core.dll
+  Delete $INSTDIR\Qt5Gui.dll
+  Delete $INSTDIR\Qt5Widgets.dll
   Delete $INSTDIR\QuickView.exe
   Delete $INSTDIR\Uninstall.exe
   Delete $INSTDIR\imageformats\*
+  Delete $INSTDIR\platforms\*  
   RMDir $INSTDIR\imageformats
+  RMDir $INSTDIR\platforms
   RMDir $INSTDIR
   DeleteRegKey /ifempty HKCU "Software\Paul Colby\QuickView"
   DeleteRegKey /ifempty HKCU "Software\Paul Colby"
@@ -93,7 +103,7 @@ VIProductVersion "0.1.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "QuickView"
 #VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "..."
 VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Paul Colby"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "(c) 2009"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "(c) 2014"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "QuickView installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "0.1.0.0"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "0.1.0.0"
