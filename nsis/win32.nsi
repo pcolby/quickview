@@ -29,12 +29,12 @@ Var StartMenuFolder
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "gpl-3.0.rtf"
 !insertmacro MUI_PAGE_DIRECTORY
-
 #!insertmacro MUI_PAGE_COMPONENTS
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU"
 !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Paul Colby\QuickView"
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "startMenuFolder"
 !insertmacro MUI_PAGE_STARTMENU Application $StartMenuFolder
+Page custom imageAssociationsPage onImageAssociationsPageLeave
 !insertmacro MUI_PAGE_INSTFILES
   
 # Modern UI2 Uninstall Pages.
@@ -44,8 +44,59 @@ Var StartMenuFolder
 # Modern UI2 Languages.
 !insertmacro MUI_LANGUAGE "English"
 
-# Sections to install... just one section for now.
-Section "QuickView"
+# Custom install pages.
+
+Function imageAssociationsPage
+	# Create a "standard" wizard page (as opposed to the welcome and finish pages).
+	!insertmacro MUI_HEADER_TEXT "Image File Associations" "Choose whether not to associate QuickView with supported image types."
+	nsDialogs::Create 1018
+	Pop $0
+	${If} $0 == error
+		Abort
+	${EndIf}
+
+	# Create some explanatory text.
+	${NSD_CreateLabel} 0 0 100% 30u "QuickView may be associated with supported image types, making it easier to open images from Explorer, etc.  Please choose which file association options you would like to enable, then click Next to continue."
+	Pop $0
+	
+	# Create the username and password edit boxes.
+	Var /GLOBAL hWndOpenWith
+	Var /GLOBAL hWndDefaultApp
+	${NSD_CreateCheckBox} 0 60u 100% 12u "Associate QuickView with supported image types"
+	Pop $hWndOpenWith
+	${NSD_OnClick} $hWndOpenWith onOpenWithCheckBoxClick
+	${NSD_SetState} $hWndOpenWith ${BST_CHECKED}
+	${NSD_CreateCheckBox} 0 71u 100% 12u "Make QuickView the default program for supported image types"
+	Pop $hWndDefaultApp
+	
+	# Show the dialog.
+	nsDialogs::Show
+FunctionEnd
+
+Function onOpenWithCheckBoxClick
+	# Enabled / disable the "Set as default" CheckBox, according to the "Open with" CheckBox.
+	Push $R0
+	${NSD_GetState} $hWndOpenWith $R0
+	${If} $R0 == ${BST_UNCHECKED}
+		${NSD_SetState} $hWndDefaultApp ${BST_UNCHECKED}
+	    EnableWindow $hWndDefaultApp 0 ; Disble the "Set as default" CheckBox.
+	${Else}
+	    EnableWindow $hWndDefaultApp 1 ; Ensble the "Set as default" CheckBox.
+    ${EndIf}
+	Pop $R0
+FunctionEnd
+
+Function onImageAssociationsPageLeave
+	# Fetch the text from the edit boxes.
+    Var /GLOBAL addOpenWith
+    Var /GLOBAL setAsDefaultApp	
+	${NSD_GetState} $hWndOpenWith $addOpenWith
+	${NSD_GetState} $hWndDefaultApp $setAsDefaultApp
+FunctionEnd
+
+# Sections to install.
+
+Section "application"
   # Files to install.
   SetOutPath $INSTDIR
   File "${VCRDIR}\msvcp110.dll"
@@ -82,8 +133,24 @@ Section "QuickView"
   WriteRegDword HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\QuickView" "NoRepair" 1
 SectionEnd
 
+Section "file associations"
+    ${If} $setAsDefaultApp == ${BST_CHECKED}
+        DetailPrint "Setting QuickView as default application for supported image types..."
+        Exec '"$INSTDIR\QuickView.exe" -set-open-with-default'
+	${ElseIf} $addOpenWith == ${BST_CHECKED}
+        DetailPrint "Enabling shell extension(s) for supported image types..."
+        Exec '"$INSTDIR\QuickView.exe" -enable-open-with'
+	${EndIf}
+SectionEnd
+
 # Sections to uninstall.
-Section "uninstall"
+
+Section "un.file associations"
+    DetailPrint "Removing any registered shell extensions..."
+    Exec '"$INSTDIR\QuickView.exe" -remove-open-with'
+SectionEnd
+
+Section "un.application"
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\QuickView"
   Delete "$DESKTOP\QuickView.lnk"
   !insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuFolder
