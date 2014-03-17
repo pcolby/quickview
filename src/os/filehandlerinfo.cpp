@@ -160,8 +160,11 @@ int FileHandlerInfo::defaultIconIndex(const QString &extension) {
     svg: iexplore,-17|  |
     svgz:*/
 
-
-    QMessageBox::information(0, QString::fromLatin1("%1").arg(extension), QString::fromLatin1("unknonw"));
+    QMessageBox messageBox;
+    messageBox.setTextFormat(Qt::RichText);
+    messageBox.setText(QString::fromLatin1("Unknown file format: %1<br/><br/>Please report this at <a href=\"%2\">%2</a>")
+                      .arg(extension).arg(QLatin1String("https://github.com/pcolby/quickview/issues")));
+    messageBox.exec();
     return -1;
 }
 
