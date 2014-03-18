@@ -40,7 +40,8 @@ class FileHandlerInfo {
 
   protected:
     static QString defaultIcon(const QString &extension);
-    static int defaultIconIndex(const QString &extension);
+    static int defaultIexploreIconIndex(const QString &extension);
+    static int defaultImageresIconIndex(const QString &extension);
     static QString programId(const QString &extension);
 };
 #endif // Q_OS_WIN

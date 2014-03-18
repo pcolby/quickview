@@ -118,34 +118,93 @@ void FileHandlerInfo::disableOpenWith(const QString &extension, const UserScope 
 
 /* Protected methods */
 
+/// @todo  Replacce all of this with our own set of pretty icons one day.
 QString FileHandlerInfo::defaultIcon(const QString &extension) {
-    /*// Use Window's default icon for the given file type.
+    // Use Window's default icon for the given file type.
     const QSettings settings(HKEY_CLASSES_ROOT, QSettings::NativeFormat);
 
     QString icon1 = settings.value(QString::fromLatin1("%1file/DefaultIcon/Default").arg(extension)).toString();
-    //if (!icon.isEmpty()) QMessageBox::information(0, QString::fromLatin1("A: %1").arg(extension), icon);
+    //if (!icon1.isEmpty()) QMessageBox::information(0, QString::fromLatin1("A: %1").arg(extension), icon1);
     if (!icon1.isEmpty()) return icon1;
 
     QString icon2 = settings.value(QString::fromLatin1("%1Image.Document/DefaultIcon/Default").arg(extension)).toString();
-    //if (!icon.isEmpty()) QMessageBox::information(0, QString::fromLatin1("B: %1").arg(extension), icon);
+    //if (!icon2.isEmpty()) QMessageBox::information(0, QString::fromLatin1("B: %1").arg(extension), icon2);
     if (!icon2.isEmpty()) return icon2;
 
     QString icon3 = settings.value(QString::fromLatin1("PhotoViewer.FileAssoc.%1/DefaultIcon/Default").arg(extension)).toString();
-    //if (!icon.isEmpty()) QMessageBox::information(0, QString::fromLatin1("C: %1").arg(extension), icon);
+    //if (!icon3.isEmpty()) QMessageBox::information(0, QString::fromLatin1("C: %1").arg(extension), icon3);
     if (!icon3.isEmpty()) return icon3;
 
-    QMessageBox::information(0, QString::fromLatin1("%1").arg(extension), QString::fromLatin1("A: %1\nB: %2\nC: %3").arg(icon1, icon2, icon3));
-
-    //QMessageBox::information(0, QString::fromLatin1("D: %1").arg(extension), QLatin1String("not found"));*/
+    // Icons can be used as their own file icons, naturally.
+    if (extension == QLatin1String("ico")) {
+        return QLatin1String("%1");
+    }
 
     // If Windows has no default, pick our own from Windows's imageres.dll.
-    return QString::fromLatin1("%SystemRoot%\\System32\\imageres.dll,%1").arg(defaultIconIndex(extension));
+    const int imageresIndex = defaultImageresIconIndex(extension);
+    if (imageresIndex != -1) {
+        return QString::fromLatin1("%SystemRoot%\\System32\\imageres.dll,%1").arg(imageresIndex);
+    }
+
+    // Otherwise try Window's iexpore.exe.
+    const int iexploreIndex = defaultIexploreIconIndex(extension);
+    if (iexploreIndex != -1) {
+        return QString::fromLatin1("%ProgramFiles%\\Internet Explorer\\iexplore.exe,%1").arg(iexploreIndex);
+    }
+
+    // We cannot determine a file type icon: let the user know (this should definitely be picked up in
+    // development, long before any end user sees it... unless they are messing with Qt's image plugins.
+    QMessageBox messageBox;
+    messageBox.setTextFormat(Qt::RichText);
+    messageBox.setText(QString::fromLatin1("Unknown file format: %1<br/><br/>Please report this at <a href=\"%2\">%2</a>")
+                      .arg(extension).arg(QLatin1String("https://github.com/pcolby/quickview/issues")));
+    messageBox.exec();
+    return QString();
 }
 
-int FileHandlerInfo::defaultIconIndex(const QString &extension) {
+/**
+ * @brief Get the index of an icon within iexplore.exe for a given file extension.
+ *
+ * This function is used as a fallback to return the "known" default icon Windows
+ * uses for the specified extension.  Normally, this is detected automatically at
+ * runtime by the defaultIcon function above, however, in case the end user's
+ * registry is messed up, we fall back to this function.
+ *
+ * Additionally, some versions of Windows do not have all known extensions. For
+ * example, some versions of Windows have no default icon for .svgz files, so here
+ * we use the same default icon that Windows uses for .svg files for .svgz too.
+ *
+ * @param extension File extension (without leading '.') to find an icon index for.
+ *
+ * @return An icon index assumed to be in iexplore.exe, or -1 if not known.
+ */
+int FileHandlerInfo::defaultIexploreIconIndex(const QString &extension) {
+    if ((extension == QLatin1String("svg")) || (extension == QLatin1String("svgz")))
+        return -17;
+
+    return -1;
+}
+
+/**
+ * @brief Get the index of an icon within imageres.dll for a given file extension.
+ *
+ * This function is used as a fallback to return the "known" default icon Windows
+ * uses for the specified extension.  Normally, this is detected automatically at
+ * runtime by the defaultIcon function above, however, in case the end user's
+ * registry is messed up, we fall back to this function.
+ *
+ * Additionally, some versions of Windows do not have all known extensions. For
+ * example, some versions of Windows have no default icon for .wbmp files, so here
+ * we use the same default icon that Windows uses for .bmp files for .wbmp too.
+ *
+ * @param extension File extension (without leading '.') to find an icon index for.
+ *
+ * @return An icon index assumed to be in imageres.dll, or -1 if not known.
+ */
+int FileHandlerInfo::defaultImageresIconIndex(const QString &extension) {
     if ((extension == QLatin1String("bmp")) || (extension == QLatin1String("ico")) || (extension == QLatin1String("pbm")) ||
         (extension == QLatin1String("pgm")) || (extension == QLatin1String("ppm")) || (extension == QLatin1String("tga")) ||
-        (extension == QLatin1String("xbm")) || (extension == QLatin1String("xpm")))
+        (extension == QLatin1String("wbmp"))|| (extension == QLatin1String("xbm")) || (extension == QLatin1String("xpm")))
         return -70;
     else if (extension == QLatin1String("gif"))
         return -71;
@@ -155,16 +214,6 @@ int FileHandlerInfo::defaultIconIndex(const QString &extension) {
         return -83;
     else if ((extension == QLatin1String("tif")) || (extension == QLatin1String("tiff")))
         return -122;
-
-    /*
-    svg: iexplore,-17|  |
-    svgz:*/
-
-    QMessageBox messageBox;
-    messageBox.setTextFormat(Qt::RichText);
-    messageBox.setText(QString::fromLatin1("Unknown file format: %1<br/><br/>Please report this at <a href=\"%2\">%2</a>")
-                      .arg(extension).arg(QLatin1String("https://github.com/pcolby/quickview/issues")));
-    messageBox.exec();
     return -1;
 }
 
