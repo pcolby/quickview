@@ -1,10 +1,10 @@
 ## QuickView Changelog
 
-### 0.1.0 (_unreleased_)
+### 0.1.0 (2014-03-19)
 Features:
 - renamed to QuickView
 - Windows Explorer integration
-- Qt 5.x (msvc2012)
+- Qt 5.2 (msvc2012)
 
 ### 0.0.1 (2011-07-23)
 Features:
