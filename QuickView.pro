@@ -27,15 +27,15 @@ CONFIG(release,debug|release) {
 # Include any necessary link options.
 win32:LIBS += -lversion
 
-# Optionally, create our custom svnbuild target.
-win32:svnbuild.commands = qrc\\gitrevision.cmd qrc\\QuickView.rc0 qrc\\QuickView.rc
-QMAKE_EXTRA_TARGETS += svnbuild
+# Optionally, create our custom revbuild target.
+win32:revbuild.commands = qrc\\gitrevision.cmd qrc\\QuickView.rc0 qrc\\QuickView.rc
+QMAKE_EXTRA_TARGETS += revbuild
 
-# Hook our optional svnbuild target in between qmake's Makefile update and the actual project target.
-svnbuildhook.depends = svnbuild
-CONFIG(debug,debug|release):svnbuildhook.target = Makefile.Debug
-CONFIG(release,debug|release):svnbuildhook.target = Makefile.Release
-QMAKE_EXTRA_TARGETS += svnbuildhook
+# Hook our optional revbuild target in between qmake's Makefile update and the actual project target.
+revbuildhook.depends = revbuild
+CONFIG(debug,debug|release):revbuildhook.target = Makefile.Debug
+CONFIG(release,debug|release):revbuildhook.target = Makefile.Release
+QMAKE_EXTRA_TARGETS += revbuildhook
 
 # Enable GNU profiling (if desired).
 #QMAKE_CXXFLAGS_DEBUG += -pg
