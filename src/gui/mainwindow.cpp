@@ -386,7 +386,6 @@ void MainWindow::rescale() {
     // Update the pixmapOffset and pixmapRect propeties.
     const int heightDiff=height()-pixmapScaled.height();
     const int widthDiff=width()-pixmapScaled.width();
-    //Q_ASSERT((heightDiff>=0)&&(widthDiff>=0));
     pixmapOffset=QPoint(widthDiff/2,heightDiff/2);           // These two member variables are calculated here
     pixmapRect=pixmapScaled.rect().translated(pixmapOffset); // so that paintEvent can be as fast as possible.
     update(); // Schedule repaint, unless hidden, etc.
