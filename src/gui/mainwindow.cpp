@@ -100,6 +100,7 @@ int MainWindow::setPath(const QFileInfo &fileInfo) {
 }
 
 void MainWindow::shrinkToWindow() {
+    moveOffset=QPoint(0,0);
     zoomMode=ShrinkToWindow;
     rescale();
 }
@@ -112,12 +113,14 @@ void MainWindow::toggleFullscreen() {
 void MainWindow::zoomIn(const float scale) {
     if (zoomMode!=ExplicitScale)
         this->scale=pixmapScaled.size().height()/static_cast<float>(pixmap.size().height());
+    moveOffset*=1.0+scale;
     zoomTo(this->scale*(1.0+scale));
 }
 
 void MainWindow::zoomOut(const float scale) {
     if (zoomMode!=ExplicitScale)
         this->scale=pixmapScaled.size().height()/static_cast<float>(pixmap.size().height());
+    moveOffset*=1.0-scale;
     zoomTo(this->scale*(1.0-scale));
 }
 
@@ -154,18 +157,20 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_9:        zoomTo(event->key()-Qt::Key_0); break;
         case Qt::Key_Asterisk: zoomToWindow();                 break;
         case Qt::Key_Backslash:zoomToWindow();                 break;
+        case Qt::Key_Down:     arrowKeyPressEvent(event);      break;
         case Qt::Key_Escape:   close();                        break;
         case Qt::Key_Equal:    zoomIn();                       break;
         case Qt::Key_F:        toggleFullscreen();             break;
         case Qt::Key_F11:      toggleFullscreen();             break;
-        case Qt::Key_Left:     loadPreviousImage();            break;
+        case Qt::Key_Left:     arrowKeyPressEvent(event);      break;
         case Qt::Key_Minus:    zoomOut();                      break;
         case Qt::Key_P:        playPause();                    break;
         case Qt::Key_Plus:     zoomIn();                       break;
-        case Qt::Key_Right:    loadNextImage();                break;
+        case Qt::Key_Right:    arrowKeyPressEvent(event);      break;
         case Qt::Key_S:        playPause();                    break;
         case Qt::Key_Slash:    shrinkToWindow();               break;
         case Qt::Key_Space:    playPause();                    break;
+        case Qt::Key_Up:       arrowKeyPressEvent(event);      break;
         case Qt::Key_X:        loadNextImage();                break;
         case Qt::Key_Z:        loadPreviousImage();            break;
         default:
@@ -217,7 +222,7 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 void MainWindow::paintEvent(QPaintEvent *event) {
     // Calculate the source and destination rectangles.
     QRect targetRect=event->rect().intersected(pixmapRect);
-    QRect sourceRect=targetRect.translated(-pixmapOffset);
+    QRect sourceRect=targetRect.translated(-pixmapOffset).translated(moveOffset);
     Q_ASSERT(sourceRect.size()==targetRect.size());
 
     // Paint the pixmap.
@@ -249,6 +254,22 @@ void MainWindow::timerEvent(QTimerEvent *event) {
 
 /* Protected slots */
 
+void MainWindow::arrowKeyPressEvent(QKeyEvent *event) {
+    if (event->modifiers() & Qt::ControlModifier) {
+        switch (event->key()) {
+            case Qt::Key_Down:  moveImageDown();  break;
+            case Qt::Key_Left:  moveImageLeft();  break;
+            case Qt::Key_Right: moveImageRight(); break;
+            case Qt::Key_Up:    moveImageUp();    break;
+        }
+    } else {
+        switch (event->key()) {
+            case Qt::Key_Left:  loadPreviousImage(); break;
+            case Qt::Key_Right: loadNextImage();     break;
+        }
+    }
+}
+
 void MainWindow::loadNextImage() {
     if (filesToShow.isEmpty())
         return;
@@ -263,6 +284,34 @@ void MainWindow::loadPreviousImage() {
     if (currentFile==filesToShow.constBegin())
         currentFile=filesToShow.constEnd();
     loadImage(*--currentFile);
+}
+
+void MainWindow::moveImageDown(const int by) {
+    if (zoomMode == ExplicitScale) {
+        moveOffset += QPoint(0,by);
+        update();
+    }
+}
+
+void MainWindow::moveImageLeft(const int by) {
+    if (zoomMode == ExplicitScale) {
+        moveOffset -= QPoint(by,0);
+        update();
+    }
+}
+
+void MainWindow::moveImageRight(const int by) {
+    if (zoomMode == ExplicitScale) {
+        moveOffset += QPoint(by,0);
+        update();
+    }
+}
+
+void MainWindow::moveImageUp(const int by) {
+    if (zoomMode == ExplicitScale) {
+        moveOffset -= QPoint(0,by);
+        update();
+    }
 }
 
 void MainWindow::updateWindowTitle() {

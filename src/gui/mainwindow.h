@@ -51,7 +51,7 @@ class MainWindow : public QWidget { Q_OBJECT
     QFileInfoList filesToShow;
     QFileInfoList::const_iterator currentFile;
     QPixmap pixmap, pixmapScaled;
-    QPoint pixmapOffset;
+    QPoint pixmapOffset, moveOffset;
     QRect pixmapRect;
     ZoomMode zoomMode;
     float scale;    ///< Scale to use when zoomMode is ExplicitScale.
@@ -66,8 +66,13 @@ class MainWindow : public QWidget { Q_OBJECT
     void timerEvent(QTimerEvent *event);
 
   protected slots:
+    void arrowKeyPressEvent(QKeyEvent *event);
     void loadNextImage();
     void loadPreviousImage();
+    void moveImageDown(const int by=10);
+    void moveImageLeft(const int by=10);
+    void moveImageRight(const int by=10);
+    void moveImageUp(const int by=10);
     void updateWindowTitle();
 
   private:
