@@ -1,5 +1,6 @@
 # QuickView
-[![GitHub version](https://badge.fury.io/gh/pcolby%2Fquickview.svg)](https://github.com/pcolby/quickview/releases/latest)
+[![Github Release](http://img.shields.io/github/release/pcolby/quickview.svg)](https://github.com/pcolby/quickview/releases/latest)
+[![GPLv3 License](http://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/copyleft/gpl.html)
 
 QuickView is a very simple, basic image viewer.  Think of it as a replacement for
 [Windows Photo Viewer](http://en.wikipedia.org/wiki/Windows_Photo_Viewer) (which
